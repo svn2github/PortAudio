@@ -160,6 +160,20 @@ PaHostApiIndex Pa_GetDefaultHostApi( void );
      
  @return The default host API index.
 */
+
+
+PaHostApiIndex Pa_HostApiTypeIdToHostApiIndex( PaHostApiTypeId type );
+/**< Convert a static host API unique identifier, into a runtime
+ host API index.
+
+ @param type A unique host API identifier belonging to the PaHostApiTypeId
+ enumeration.
+
+ @return A valid PaHostApiIndex ranging from 0 to (Pa_CountHostApis()-1), or
+ -1 if the host API specified by the type parameter is not available.
+ 
+ @see PaHostApiTypeId
+*/
 </PRE>
 
 
