@@ -17,16 +17,16 @@ content="PortAudio, audio, tutorial, library, portable, open-source, DirectSound
 
 <P><A href="index.html">Enhancement Proposals Index</A>,
 <A href="http://www.portaudio.com/">PortAudio Home Page</A></P>
-<P>Updated: October 22, 2002 </P>
+<P>Updated: December 3, 2002 </P>
 
 <H4>Status</H4>
 
-<P>This proposal is open for discussion.</P>
+<P>This proposal is sufficiently well defined to be implemented.</P>
 
 <H4>Background</H4>
 
 <P>
-Currently (V18), when a stream is started, host buffers are initially filled with zeros (silence). This is done so that the Stream Callback: a) is called at regular intervals (useful for time syncronisation), b) provides relatively constant and predictable latency from calback to output, and c) avoids a peak in processor load that would occur if all of the buffers were initialised directly one after another. The downside of this strategy is that the startup latency is held constant, whereas some host APIs may be able to provide significantly lower startup latency if the initial buffers are filled with valid sample data. 
+Currently (V18), when a stream is started, host buffers are initially filled with zeros (silence). This is done so that the Stream Callback: a) is called at regular intervals (useful for time syncronisation), b) provides relatively constant and predictable latency from calback to output, and c) avoids a peak in processor load that would occur if all of the buffers were initialised directly one after another. The downside of this strategy is that the startup latency is held constant, whereas some host APIs may be capable of providing significantly lower startup latency if the initial buffers are filled with valid sample data. 
 </P>
 
 <P>
@@ -37,11 +37,16 @@ Although it is generally considered that the current behavior is the most widely
 <H4>Proposal</H4>
 
 <P>
-Define a flag to be used in the streamFlags parameter to Pa_OpenStream that indicates that the initial output buffer(s) should be primed using the stream callback instead of the default of priming the buffers with zeros (silence). This flag has no effect for input-only streams.
+Define a flag to be used in the streamFlags parameter to Pa_OpenStream that indicates that the initial output buffer(s) should be primed using the stream callback, instead of the default behavior of priming the buffers with zeros (silence). This flag has no effect for input-only streams.
 </P>
 
 <PRE>
-#define paPrimeOutputBuffersUsingStreamCallback (1<<3)
+/** Call the stream callback to fill initial output buffers, rather than the
+ default behavior of priming the buffers with zeros (silence). This flag has
+ no effect for input-only and blocking read/write streams.
+ @see PaStreamFlags
+*/
+#define   paPrimeOutputBuffersUsingStreamCallback ((PaStreamFlags) 0x00000008)
 </PRE>
 
 <P>
@@ -49,7 +54,11 @@ Define a flag which will be passed to the stream callback via the statusFlags pa
 </P>
 
 <PRE>
-#define paPrimingOutput (1<<4)
+/** Some of all of the output data will be used to prime the stream, input
+ data may be zero.
+ @see PaStreamCallbackFlags
+*/
+#define paPrimingOutput    ((PaStreamCallbackFlags) 0x00000010)
 </PRE>
 
 
@@ -61,11 +70,7 @@ If the stream is a full-duplex stream, the calback's input buffer will contain z
 <H4>Discussion</H4>
 
 <P>
-It is not yet clear whether opening an input-only stream with the paPrimeOutputBuffersUsingStreamCallback flag is an error.
-</P>
-
-<P>
-Although the new Pa_GetStream*Latency functions are able to report the latency 
+Although the new inputLatency and outputLatency PaStreamInfo fields are able to report the latency 
 for a standard call to the stream callback, these latency values will not be accurate
 for priming call(s) to the stream callback. It would be difficult to accurately 
 predict the startup latency when the callback is used to prime the stream,
