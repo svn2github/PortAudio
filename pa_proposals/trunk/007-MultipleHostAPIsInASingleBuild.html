@@ -142,8 +142,7 @@ typedef int PaHostApiIndex;
 */
 
 
-PaHostApiIndex Pa_CountHostApis( void );
-/**< Retrieve the number of available host APIs. Even if a host API is
+/** Retrieve the number of available host APIs. Even if a host API is
  available it may have no devices available.
  
  @return The number of available host APIs. May return 0 if PortAudio is
@@ -151,19 +150,19 @@ PaHostApiIndex Pa_CountHostApis( void );
      
  @see PaHostApiIndex
 */
+PaHostApiIndex Pa_CountHostApis( void );
 
 
-PaHostApiIndex Pa_GetDefaultHostApi( void );
-/**< Retrieve the index of the defualt hostAPI. The default host API will be
+/** Retrieve the index of the defualt hostAPI. The default host API will be
  the lowest common denominator host API on the current platform and is
  unlikely to provide the best performance.
      
  @return The default host API index.
 */
+PaHostApiIndex Pa_GetDefaultHostApi( void );
 
 
-PaHostApiIndex Pa_HostApiTypeIdToHostApiIndex( PaHostApiTypeId type );
-/**< Convert a static host API unique identifier, into a runtime
+/** Convert a static host API unique identifier, into a runtime
  host API index.
 
  @param type A unique host API identifier belonging to the PaHostApiTypeId
@@ -174,23 +173,44 @@ PaHostApiIndex Pa_HostApiTypeIdToHostApiIndex( PaHostApiTypeId type );
  
  @see PaHostApiTypeId
 */
+PaHostApiIndex Pa_HostApiTypeIdToHostApiIndex( PaHostApiTypeId type );
 </PRE>
 
 
 <P>3. Provide a method for retrieving information about a given host API:</P>
 <PRE>
+/** A structure containing information about a particular host API. */
 typedef struct
 {
     int structVersion;
-    PaHostApiTypeId type; /**< the well known unique identifier of this host API @see PaHostApiTypeId*/
-    const char *name; /* a textual description of the host API for display on user interfaces */
+	/** the well known unique identifier of this host API @see PaHostApiTypeId*/
+    PaHostApiTypeId type; 
+	/** a textual description of the host API for display on user interfaces */
+    const char *name; 
+
+	/**  The number of devices belonging to this host API. This field may be
+     used in conjunction with Pa_HostApiDeviceIndexToDeviceIndex() to enumerate
+     all devices for this host API.
+     @see Pa_HostApiDeviceIndexToDeviceIndex
+    */
+    int deviceCount;
+
+    /** The the default input device for this host API. The value will be a
+     device index ranging from 0 to (Pa_CountDevices()-1), or paNoDevice
+     if no default input device is available.
+    */
+    PaDeviceIndex defaultInputDevice;
+
+    /** The the default output device for this host API. The value will be a
+     device index ranging from 0 to (Pa_CountDevices()-1), or paNoDevice
+     if no default output device is available.
+    */
+    PaDeviceIndex defaultOutputDevice;
+
 }
 PaHostApiInfo;
-/**< A structure containing information about a particular host API. */
 
-
-const PaHostApiInfo * Pa_GetHostApiInfo( PaHostApiIndex hostApi );
-/**< Retrieve a pointer to a structure containing information about a specific
+/** Retrieve a pointer to a structure containing information about a specific
  host Api.
      
  @param hostApi A valid host API index ranging from 0 to (Pa_CountHostApis()-1)
@@ -203,6 +223,8 @@ const PaHostApiInfo * Pa_GetHostApiInfo( PaHostApiIndex hostApi );
  be manipulated or freed. The pointer is only guaranteed to be valid between
  calls to Pa_Initialize() and Pa_Terminate().
 */
+const PaHostApiInfo * Pa_GetHostApiInfo( PaHostApiIndex hostApi );
+
 </PRE>
 
 <P>4. Add a new field to PaDeviceInfo to identify the host API type:</P>
@@ -225,56 +247,24 @@ if( Pa_GetHostApiInfo( deviceInfo-&gt;hostApi )-&gt;typeId == paWin32MME ){
 }
 </PRE>
 
-<P>5. Provide methods for finding per-host API default devices:</P>
+<P>5. Provide a facility for finding per-host API default devices. - This functionality is provided by the defaultInputDevice and defaultOutputDevice fields in the PaHostApiInfo structure.</P>
+
+<P>6. Provide a facility for enumerating devices on a per-host-API basis. Note that this functionality is provided in addition to the current Pa_CountDevices() and Pa_GetDeviceInfo() functions:</P>
 <PRE>
-PaDeviceIndex Pa_HostApiDefaultInputDevice( PaHostApiIndex hostApi );
-/**< Retrieve the default input device for the specified host API
-     
- @param hostApi A valid host API index ranging from 0 to (Pa_CountHostApis()-1)
-     
- @return A device index ranging from 0 to (Pa_CountDevices()-1), or paNoDevice
- if there is no default input device available for the specified host API.
-*/
-
-
-PaDeviceIndex Pa_HostApiDefaultOutputDevice( PaHostApiIndex hostApi );
-/**< Retrieve the default output device for the specified host API
-
- @param hostApi A valid host API index ranging from 0 to (Pa_CountHostApis()-1)
-
- @return A device index ranging from 0 to (Pa_CountDevices()-1), or paNoDevice
- if there is no default output device available for the specified host API.
-*/
-</PRE>
-
-<P>6. Provide functions for enumerating devices on a per-host-API basis. Note that this functionality is provided in addition to the current Pa_CountDevices() and Pa_GetDeviceInfo() functions:</P>
-<PRE>
-int Pa_HostApiCountDevices( PaHostApiIndex hostApi );
-/**< Retrieve the number of devices belonging to a specific host API.
- This function may be used in conjunction with Pa_HostApiDeviceIndexToDeviceIndex()
- to enumerate all devices for a specific host API.
- 
- @param hostApi A valid host API index ranging from 0 to (Pa_CountHostApis()-1)
-     
- @return The number of devices belonging to the specified host API.
-     
- @see Pa_HostApiDeviceIndexToDeviceIndex
-*/
-
-
-PaDeviceIndex Pa_HostApiDeviceIndexToDeviceIndex( PaHostApiIndex hostApi,
-        int hostApiDeviceIndex );
-/**< Convert a host-API-specific device index to standard PortAudio device index.
- This function may be used in conjunction with Pa_HostApiCountDevices() to
- enumerate all devices for a specific host API.
+/** Convert a host-API-specific device index to standard PortAudio device index.
+ This function may be used in conjunction with the deviceCount field of
+ PaHostApiInfo to enumerate all devices for the specified host API.
 
  @param hostApi A valid host API index ranging from 0 to (Pa_CountHostApis()-1)
 
  @param hostApiDeviceIndex A valid per-host device index in the range
- 0 to (Pa_HostApiCountDevices(hostApi)-1)
+ 0 to (Pa_GetHostApiInfo(hostApi)->deviceCount-1)
 
- @see Pa_HostApiCountDevices
+ @see PaHostApiInfo
 */
+PaDeviceIndex Pa_HostApiDeviceIndexToDeviceIndex( PaHostApiIndex hostApi,
+        int hostApiDeviceIndex );
+
 </PRE>
 
 <P>7. Re-implement the following existing functions to use the default host API. This would be a backwards compatible change.</P>
