@@ -17,7 +17,7 @@ content="PortAudio, audio, tutorial, library, portable, open-source, DirectSound
 
 <P><A href="index.html">Enhancement Proposals Index</A>,
 <A href="http://www.portaudio.com/">PortAudio Home Page</A></P>
-<P>Updated: October 26, 2002 </P>
+<P>Updated: January 7, 2004 </P>
 
 <H4>Status</H4>
 
@@ -25,35 +25,59 @@ content="PortAudio, audio, tutorial, library, portable, open-source, DirectSound
 This proposal is sufficiently well defined to be implemented. 
 </P>
 
+<H4>Dependencies</H4>
+
+<P>
+This proposal depends on <A HREF="004-CallbackVariableFramesPerBuffer.html">004 - Allow Callbacks to Accept Variable Number of Frames per Buffer</A> because the paNeverDropInput flag proposed here requires callbacks to vary the number of frames per buffer.
+</P>
+
 <H4>Background</H4>
 
 <P>
-There are conditions where a full-duplex stream needs to generate output but doesn't have any input available, or where it has too much input so some input needs to be discarded (not passed to the output.) There is also the case where output is needed, but the callback has (transiently) consumed so much CPU time that output has to be generated without the callback being called.
-</P>
-
-<P>Currently (V17) the Stream Callback Function handles these underflow/overflow conditions by passing NULL buffer pointers to the callback. This can happen if the output is pre-rolled and there is not yet any input data. It can also happen if the input underflows. 
+Once a PortAudio stream is running, every input and/or output sample should be passed between the hardware and the Stream Callback. Unfortunately in the real-world contexts in which PortAudio operates it is not always possible to achieve this goal. Sometimes buffers will underflow (no data is available when needed) or overflow (more data is available than can be processed). These underflows and overflows are often the result of the failure of some subsystem to keep up with real-time deadlines. Sometimes this is caused by client code, for example if the Stream Callback consumes too much CPU time before returning. At other times it is the result of system level interactions between the scheduling of interrupt handlers, processes, timers or threads. PortAudio introduces another potential source of underflow and overflow: when combining separate input and output devices into a full duplex device it must account for any skew or drift between these devices. It does this by inserting silence in the case of an underflow, or discarding samples in case of an overflow. Note that this skew correction is a boundary case which should not arise with true full-duplex hardware, however it must be dealt with as a possibility when fusing independent input and output devices into a full duplex stream.
 </P>
 
 <P>
-A number of concerns have been raised about the current system: For PortAudio to discard input just because it is not needed for output is considered unacceptable for some recording applications. Passing of NULL buffer pointers has been deemed to be too error prone and requires too much housekeeping for simple programs.
+From the previous description it may be observed that there are cases where PortAudio is at-best only able to detect that an underflow or overflow has occured, and there are other cases where PortAudio is in full control of the underflow or overflow. In the former case samples may be dropped by a separate subsystem (the driver for example) and hence are impossible to recover. In the latter case excess (overflowed) input samples may be received by PortAudio but not passed to the Stream Callback, and an input underflow may cause PortAudio to send additional zero (silent) samples to the callback -- equivalent operations may occur with respect to the callback's output.
+</P>
+
+<p>
+Currently (V18) handles underflow conditions by passing NULL buffer pointers to the callback. This can happen if the output is pre-rolled and there is not yet any input data. It can also happen if the input underflows in a full-duplex stream. However aside from observing that this sometimes happens, the functionality was never designed, well documented or uniformly implemented. 
+</p>
+<p>
+Below are listed the three main shortcomings in the way V18 handles underflow and overflow conditions:
+</p>
+
+<ol>
+<li>
+Clients should be able to depend on PortAudio to implement a policy to manage underrun and overrun conditions without requiring the client to write any underrun or overrun related code. Passing NULL buffer pointers when an underrun occurs requires even simple clients to check for a valid buffer pointer. This is an error prone approach. 
+</li>
+<li>
+In most cases there is no way for clients who are concerned with underflows and overflows to determine when they have occurred. The only condition which is currently signalled are underflows where PortAudio needs to call the callback and has no data (in which case it may pass a NULL buffer pointer).
+</li>
+<li>
+In the case of PortAudio managed underrun and overrun (such as full-duplex skew correction) there is no consistent, clearly stated policy on how PortAudio is to discard overflowed data or zero-pad when underflow occurs. An "ouput driven" full-duplex model has been proposed where the quality of the output stream is maintained and input is discarded or padded to keep input in sync with output. Similarly an "input driven" model is possible. Although the output-driven model is favoured for many applications, it is unacceptable for PortAudio to discard and/or silently zero-pad input data to assure the quality of output when used in applications primarily concerned with audio capture. 
+</li>
+</ol>
+
+<P>
+This proposal seeks to address the above issues by providing full access to detected underflow and overflow information, and by giving the client access to all available input and output sample data when required. At the same time this proposal seeks to make implementing the Stream Callback as simple as possible to ensure ease-of-use.
 </P>
 
 <P>
-See <A HREF="http://techweb.rfa.org/pipermail/portaudio/2001-October/000222.html">http://techweb.rfa.org/pipermail/portaudio/2001-October/000222.html</A> and subsequent messages in various threads.
-</P>
-
-<P>
-This proposal seeks to make implementing the Stream Callback as simple as possible for ease-of-use while providing full access to overflow/underflow information, and all input and output sample data when clients require it.
-</P>
+See <A HREF="http://techweb.rfa.org/pipermail/portaudio/2001-October/000222.html">http://techweb.rfa.org/pipermail/portaudio/2001-October/000222.html</A> and subsequent messages in various threads. This proposal was reopened in order to fix a problem described here:
+<A HREF="http://techweb.rfa.org/pipermail/portaudio/2003-December/002926.html">http://techweb.rfa.org/pipermail/portaudio/2003-December/002926.html</A>
+and discussed extensively in that thread including:
+<A HREF="http://techweb.rfa.org/pipermail/portaudio/2004-January/002946.html">http://techweb.rfa.org/pipermail/portaudio/2004-January/002946.html</A> which provides an  explanation of the issues surrounding the proposed paNeverDropInput flag.</P>
 
 <H4>Proposal</H4>
 
 <P>
-For streams providing input, the inputBuffer parameter will always point to a valid memory location containing framesPerBuffer frames of sample data in the requested format. The inputBuffer parameter will be NULL for output only streams. Similarly, the outputBuffer parameter will be NULL for input only streams, otherwise it will point to a valid memory location containing framesPerBuffer frames of sample data.
+For streams providing input, the inputBuffer Stream Callback Function parameter will always point to a valid memory location containing framesPerBuffer frames of sample data in the requested format. The inputBuffer parameter will be NULL for output only streams. Similarly, the outputBuffer parameter will be NULL for input only streams, otherwise it will always point to a valid memory location with sufficient space for framesPerBuffer frames of sample data.
 </P>
 
 <P>
-A new parameter and corresponding type will be added to the Stream Callback Function that gives the status of the data as bit flags. 
+A new parameter and corresponding type will be added to the Stream Callback Function that indicates the status of the callback data as a set of bit flags: 
 </P>
 
 <PRE>
@@ -70,22 +94,246 @@ typedef int (PaStreamCallback)(
 <P>The following bits may be set in the statusFlags parameter. </P>
 
 <PRE>
-#define paInputUnderflow&nbsp;&nbsp; ((PaStreamCallbackFlags)0x01) /* Input data is all zeros because no real data is available. */ 
-#define paInputOverflow    ((PaStreamCallbackFlags)0x02) /* Input data was discarded by PortAudio */
-#define paOutputUnderflow  ((PaStreamCallbackFlags)0x04) /* Output data was inserted by PortAudio because the callback is using too much CPU */
-#define paOutputOverflow   ((PaStreamCallbackFlags)0x08) /* Output data will be discarded because no room is available. */</PRE>
+#define paInputUnderflow&nbsp;&nbsp; ((PaStreamCallbackFlags)0x01)
+#define paInputOverflow    ((PaStreamCallbackFlags)0x02)
+#define paOutputUnderflow  ((PaStreamCallbackFlags)0x04)
+#define paOutputOverflow   ((PaStreamCallbackFlags)0x08) 
+</PRE>
 
 <P>New rules will govern when the Stream Callback is called:</P>
 
-<UL>
-<LI>For input-only streams, the callback will be called for every available input buffer. If the callback takes too long to complete and input samples have to be discarded the paInputOverflow flag will be set the next time the callback is called. An input-only stream will never be called with the paInputUnderflow flag set. </LI>
-<LI>For output-only streams, the callback will be called whenever an output buffer needs to be filled, except when doing so would cause the stream to fall further behind real-time due to the CPU load being too high. In such cases PortAudio will insert silence or repeat the previous buffer to the output and the paOutputUnderflow bit will be set next time the callback is called. An output-only stream will never be called with the paOutputOverflow flag set. </LI>
-<LI>By default, a full duplex stream will behave according to the same rules as an output-only stream. If input is not available, the paInputUnderflow bit will be set and the input buffers will contain zeros. In the case of an input buffer overflow, PortAudio will discard input - in such cases the input samples will <B>not</B> be passed to a callback, and paInputOverflow will be set next time the callback is called to generate more output. A full-duplex stream in default mode will never be called with the paOutputOverflow flag set. </LI>
-<LI>A new mode flag to Pa_OpenStream(), <I>paNeverDropInput</I> specifies that a full duplex stream will not discard overflowed input samples without calling the callback. When an input buffer overflow occurs, the callback will be passed an input buffer containing valid data and a valid output buffer pointer, the paOutputOverflow flag will be set, when the callback completes the output buffer will be discarded.</LI></UL>
+
+<p>
+<table width=80% cellpadding=2 cellspacing=1>
+<tr>
+<td bgcolor=#000099 colspan=2 align=center>
+<font color=#ffffff size=+2>Input-only streams</font>
+</td>
+</tr>
+<tr>
+<td bgcolor=#eeeeee width=50%><b>Input underflow:</b></td>
+<td bgcolor=#eeeeee width=50%><b>Input overflow:</b></td>
+</tr>
+<tr>
+<td>Never happens</td>
+<td>If callback is slow, input data is discarded.</td>
+</tr>
+</table>
+</p>
 
 <P>
-Note that the default full-duplex mode is intended to cover most common uses of PortAudio, where the client wants a simple audio streaming interface, and is happy to let PortAudio handle buffer underflow/overflow conditions when they occur.
+For input-only streams, the callback will be called once for every
+available input buffer, except that in cases where deadlines are missed an
+input overflow may occur. This overflow may be indicated to PortAudio by the
+host API, or may result from a PortAudio implementation choosing to discard
+samples. In either case one or more input samples will be discarded and not
+passed to the callback. Whenever an input overflow is detected by PortAudio
+the paInputOverflow flag will be set in the callback containing the first
+input sample following the overflow. Note that unless the stream was opened
+with the paFramesPerBufferUnspecified flag, the first input sample following
+the overflow may not be the first sample in the callback buffer. An
+input-only stream will never be called with the paInputUnderflow flag set, 
+nor will it be called with the paOutputUnderflow or paOutputOverflow flags set.
 </P>
+<BR>
+
+<p>
+<table width=80% cellpadding=2 cellspacing=1>
+<tr>
+<td bgcolor=#000099 colspan=2 align=center>
+<font color=#ffffff size=+2>Output-only streams</font>
+</td>
+</tr>
+<tr>
+<td bgcolor=#eeeeee width=50%><b>Output underflow:</b></td>
+<td bgcolor=#eeeeee width=50%><b>Output overflow:</b></td>
+</tr>
+<tr>
+<td>If callback is slow, output to DAC is padded</td>
+<td>Never happens</td>
+</tr>
+</table>
+</p>
+
+<P>
+For output-only streams, the callback will be called whenever an output
+buffer needs to be filled, except when doing so would cause the stream to
+underflow its available buffer resources (for example due to the CPU load
+being too high).  In such cases PortAudio may employ an efficient technique
+such as inserting silence or repeating previous buffers to recover from the
+underflow. An underflow may also arise between the host API and PortAudio in
+which case PortAudio may be able to detect the underflow. In either case one
+or more spurious output samples (or gaps) will have been sent to the DACs.
+Whenever an output underflow is detected by PortAudio, the paOutputUnderflow
+flag will be set in the callback containing the first output sample
+following the underflow. Note that unless the stream was opened with the
+paFramesPerBufferUnspecified flag, the first output sample following the
+underflow may not be the first sample in the callback buffer. An output-only
+stream will never be called with the paOutputOverflow flag set, nor will it
+be called with the paInputUnderflow or paInputOverflow flags set.
+</P>
+<BR>
+
+<p>
+<table width=80% cellpadding=2 cellspacing=1>
+<tr>
+<td bgcolor=#000099 colspan=2 align=center>
+<font color=#ffffff size=+2>Full-duplex</font><br>
+<font color=#ffffff>without paNeverDropInput (default mode)</font>
+</td>
+</tr>
+
+<tr>
+<td bgcolor=#eeeeee width=50%><b>Input underflow:</b></td>
+<td bgcolor=#eeeeee width=50%><b>Input overflow:</b></td>
+</tr>
+<tr>
+<td>If output would underflow if the callback wasn't 
+  called, zeroed input is passed to callback.</td>
+<td>If callback is slow or output queue is 
+  already full, input data is discarded.</td>
+</tr>
+
+<tr>
+<td bgcolor=#eeeeee width=50%><b>Output underflow:</b></td>
+<td bgcolor=#eeeeee width=50%><b>Output overflow:</b></td>
+</tr>
+<tr>
+<td>If callback is slow, output to DAC is padded.</td>
+<td>Never happens</td>
+</tr>
+</table>
+</p>
+
+<P>
+By default, a full duplex stream will have output behaviour the same as an
+output-only stream, and will have input behaviour similar to an input-only
+stream with the following exceptions and additions: If sufficient input is
+not available, the paInputUnderflow bit will be set and one or more ranges
+of samples in the input buffer will contain silence. If the stream was
+opened with the paFramesPerBufferUnspecified flag, the paInputUnderflow flag
+indicates that the whole input buffer contains silence, otherwise it
+indicates that some portions of the input buffer contain silence. In the
+case of an input overflow, PortAudio will discard input as for a half-duplex
+input stream and the paInputOverflow flag will be set in the callback
+containing the first input sample following the overflow. Note that unless
+the stream was opened with the paFramesPerBufferUnspecified flag, the first
+input sample following the overflow may not be the first sample in the
+callback buffer. A full-duplex stream in default mode will never be called
+with the paOutputOverflow flag set.
+</P>
+<BR>
+
+<p>
+<table width=80% cellpadding=2 cellspacing=1>
+<tr>
+<td bgcolor=#000099 colspan=2 align=center>
+<font color=#ffffff size=+2>Full-duplex</font><br>
+<font color=#ffffff>with paNeverDropInput</font>
+</td>
+</tr>
+
+<tr>
+<td bgcolor=#eeeeee width=50%><b>Input underflow:</b></td>
+<td bgcolor=#eeeeee width=50%><b>Input overflow:</b></td>
+</tr>
+<tr>
+<td>If output would underflow if the callback wasn't 
+  called, zeroed input is passed to callback.</td>
+<td>If callback is slow, input data is discarded.
+    (If output queue is already full, callback is called
+	 with input only so that no input data is lost.)</td>
+</tr>
+
+<tr>
+<td bgcolor=#eeeeee width=50%><b>Output underflow:</b></td>
+<td bgcolor=#eeeeee width=50%><b>Output overflow:</b></td>
+</tr>
+<tr>
+<td>If callback is slow, output to DAC is padded.</td>
+<td>If input would otherwise overflow if the 
+    callback wasn't called, output is discarded.</td>
+</tr>
+</table>
+</p>
+
+<P>
+A new flag for the Pa_OpenStream() streamFlags parameter is introduced:
+paNeverDropInput. This flag may be used to request that a full
+duplex stream will make all possible efforts to pass "potentially
+overflowing" input samples to the callback. This flag may only be used for 
+full duplex streams, and only in
+combination with paFramesPerBufferUnspecified, otherwise Pa_OpenStream()
+will return an error (paInvalidFlag). The semantics for a full duplex
+stream with the paNeverDropInput flag differ from the default full-duplex
+stream mode in the following way: When a potential input buffer overflow
+condition occurs, such that PortAudio has access to overflowed input data,
+the Stream Callback will be passed this input data in the input buffer, a valid
+output buffer pointer will be provided, and the paOutputOverflow flag
+will be set. When the callback completes, any data written to the output
+buffer will be discarded. Input buffer overflows where PortAudio does not
+have access to the overflowed data are indicated to the callback using the
+paInputOverflow flag as for input-only and default full-duplex streams.
+</P>
+<BR>
+
+
+<P>
+As noted earlier, underflow and overflow conditions give rise to discontinuities 
+where samples have or will be inserted into or removed from the sample stream.
+These discontinuities are indicated to the client by the four underflow and overflow flags defined earlier.
+When a stream is opened with the paFramesPerBufferUnspecified flag such
+discontinuities are guarenteed to fall on the boundaries between the last sample
+of one callback and the first sample of the next. No such guarantee is 
+made if paFramesPerBufferUnspecified is not used (ie a fixed, client specified
+callback buffer size is requested). In this case the flags indicate that an 
+underflow or overflow condition has occurred (and hence a discontinuity is present)
+adjacent to <i>one or more</i> samples within the current callback buffers.
+This imprecision in identifying the location of underflows and overflows 
+is a side effect of potential adaption between fixed callback and host 
+API buffer sizes. 
+</P>
+
+<P>
+It is important to note two important cases when paFramesPerBufferUnspecified 
+is used with a full-duplex stream:
+(1) When the input underflows, the Stream Callback will be called with the paInputUnderflow flag set and
+the entire input buffer will contain silence (zeros); 
+(2) in paNeverDropInput mode, an excess of input data will force an output overflow. The excess input will be passed to the callback, and the paOutputOverflow flag will be set. The entire input buffer will contain only the excess samples and the entire output buffer will be discarded when the callback returns.
+</P>
+
+<H4>Discussion</H4>
+
+<P>The original definition of this proposal ommitted consideration of any underflow and overflow conditions which did not directly arise from the PortAudio implementation. It said nothing of detected low-level underflow and overflow conditions, or of the difference between an overflow where the data is discarded by PortAudio, and an overflow where the overflowed data is discarded by an inaccessible subsystem and is hence unrecoverable.</P>
+
+<P>
+paNeverDropInput was only considered after it became clear that it was necessary to specify sematics for handling input/output skew correction and other conditions which might call for PortAudio to discard samples. paNeverDropInput resulted from some clients being more interested in preserving input coherence, while others were concerned primarily with output coherence. The choice to favour output in the default case arose primarily because of the bias of the designers. It can also be justified on the grounds that (1) full duplex audio processing clients are more common than full duplex clients favouring high-quality capture over output quality, (2) that calling a full-duplex callback only to throw away the output may result in a CPU load spike, and (3) to a full duplex effects processing application there is not a lot of difference between a corrupted input or output if input/output skew must be compensated somehow.
+</P>
+
+<P>
+The paFramesPerBufferUnspecified flag was defined elsewhere for other reasons.
+The requirement of paFramesPerBufferUnspecified for paNeverDropInput was only decided at a very late stage once implementation problems arose with combining this proposal with the buffer adapter (pa_process.c) used in the V19 implementations. The buffer adapter meant that it was not possible to place discontinuities on buffer boundaries in some instances, so the position of discontinuities was relaxed, except when using paFramesPerBufferUnspecified. Dominic Mazzoni noted that 
+"when the
+application is just trying to capture audio to disk (a primary goal of
+Audacity and also probably some other apps), the buffer size doesn't
+matter (as long as it's less than some maximum) but avoiding dropped
+samples does."
+</P>
+
+<P>
+Note that some of the language used to describe the paNeverDropInput case is biased towards a model that assumes the output device is the master. For example "excess input data" could equally be phrased "lack of need for output data".
+</P>
+
+<P>
+At one stage it was suggested that excess input data could be supplied by providing a "partially full" input or output buffer, however this would have required separate frame count parameters for the input and output buffers -- a situation which is not satisfactory because one of the main benefits of full duplex PortAudio is it manages the issues of keeping input and output buffers in sync for the client.
+</P>
+
+<P>
+Note that both full-duplex modes fulfill the guarantee that both the input and output buffers are always valid. This has the benefit of offering minimal surprise to clients -- clients who ignore the paInputUnderflow flag will not crash if
+they try to read the buffer, they will just get a bit of silence in
+their stream.  Simple clients may use either mode without implementing special handling for underflow or overflow conditions. Each mode has its own benefits, the default favours output quality, paNeverDropInput offers improved capture quality and supports equivalent output quality if the client is careful to not generate output samples when the paOutputOverflow flag is set.
+</P>
+
 
 <H4>Impact Analysis</H4>
 
@@ -95,3 +343,4 @@ This proposal involves adding a new statusFlags parameter to the PaStreamCallbac
 
 </BODY>
 </HTML>
+  
