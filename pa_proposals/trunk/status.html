@@ -30,7 +30,7 @@ TD.na	{}
 </CENTER>
 
 <P><A href="http://www.portaudio.com/">PortAudio Home Page</A></P>
-<P>Updated: January 7, 2004 </P>
+<P>Updated: January 9, 2004 </P>
 
 <H2>Background</H2>
 
@@ -599,13 +599,13 @@ The following table indicates the status of running each test in /pa_tests with 
 </p>
 
 <p>
-Note that these tests don't yet cover every feature of the V19 API. All of the tests from the V18 PortAudio release are listed below, which should give some indication of the degree to which V19-devel currently implements the V18 feature set.
+Note that these tests don't yet cover every feature of the V19 API. The tests from the V18-patch branch have been ported to the V19 API and are included in the list below, which should give some indication of the degree to which V19-devel currently implements the V18 feature set.
 </p>
 
 <table border="1">
 
-<tr><td><b>Test</b></td>
-<td>Description</td>
+<tr><td><b>File Name</b></td>
+<td><b>Description</b></td>
 <td>wmme</td>
 <td>ds</td>
 <td>asio</td>
@@ -617,6 +617,9 @@ Note that these tests don't yet cover every feature of the V19 API. All of the t
 <td>sgi</td>
 </tr>
 
+
+<tr><td colspan="11"><b>Tests adapted from V18-patch</b></td></tr>
+
 <tr><td>paqa_devs.c</td><td> Self Testing Quality Assurance app for PortAudio Try to open each device and run through all the possible configurations</td>
 <td class="unknown">wmme</td>
 <td class="unknown">ds</td>
@@ -624,8 +627,8 @@ Note that these tests don't yet cover every feature of the V19 API. All of the t
 <td class="unknown">alsa</td>
 <td class="unknown">jack</td>
 <td class="unknown">oss</td>
-<td class="unknown">mac_sm</td>
-<td class="unknown">mac_core</td>
+<td class="not_done">mac_sm</td>
+<td class="not_done">mac_core</td>
 <td class="done">sgi</td>
 </tr>
 
@@ -636,8 +639,8 @@ Note that these tests don't yet cover every feature of the V19 API. All of the t
 <td class="unknown">alsa</td>
 <td class="unknown">jack</td>
 <td class="unknown">oss</td>
-<td class="unknown">mac_sm</td>
-<td class="unknown">mac_core</td>
+<td class="not_done">mac_sm</td>
+<td class="not_done">mac_core</td>
 <td class="unknown">sgi</td>
 </tr>
 
@@ -648,8 +651,8 @@ Note that these tests don't yet cover every feature of the V19 API. All of the t
 <td class="unknown">alsa</td>
 <td class="unknown">jack</td>
 <td class="unknown">oss</td>
-<td class="unknown">mac_sm</td>
-<td class="unknown">mac_core</td>
+<td class="not_done">mac_sm</td>
+<td class="not_done">mac_core</td>
 <td class="done">sgi</td>
 </tr>
 
@@ -660,20 +663,8 @@ Note that these tests don't yet cover every feature of the V19 API. All of the t
 <td class="unknown">alsa</td>
 <td class="unknown">jack</td>
 <td class="unknown">oss</td>
-<td class="unknown">mac_sm</td>
-<td class="unknown">mac_core</td>
-<td class="done">sgi</td>
-</tr>
-
-<tr><td>patest_callbackstop.c</td><td> Test the paComplete callback result code </td>
-<td class="unknown">wmme</td>
-<td class="unknown">ds</td>
-<td class="unknown">asio</td>
-<td class="unknown">alsa</td>
-<td class="unknown">jack</td>
-<td class="unknown">oss</td>
-<td class="unknown">mac_sm</td>
-<td class="unknown">mac_core</td>
+<td class="not_done">mac_sm</td>
+<td class="not_done">mac_core</td>
 <td class="done">sgi</td>
 </tr>
 
@@ -684,8 +675,8 @@ Note that these tests don't yet cover every feature of the V19 API. All of the t
 <td class="unknown">alsa</td>
 <td class="unknown">jack</td>
 <td class="unknown">oss</td>
-<td class="unknown">mac_sm</td>
-<td class="unknown">mac_core</td>
+<td class="not_done">mac_sm</td>
+<td class="not_done">mac_core</td>
 <td class="done">sgi</td>
 </tr>
 
@@ -696,8 +687,8 @@ Note that these tests don't yet cover every feature of the V19 API. All of the t
 <td class="unknown">alsa</td>
 <td class="unknown">jack</td>
 <td class="unknown">oss</td>
-<td class="unknown">mac_sm</td>
-<td class="unknown">mac_core</td>
+<td class="not_done">mac_sm</td>
+<td class="not_done">mac_core</td>
 <td class="done">sgi</td>
 </tr>
 
@@ -708,8 +699,8 @@ Note that these tests don't yet cover every feature of the V19 API. All of the t
 <td class="unknown">alsa</td>
 <td class="unknown">jack</td>
 <td class="unknown">oss</td>
-<td class="unknown">mac_sm</td>
-<td class="unknown">mac_core</td>
+<td class="not_done">mac_sm</td>
+<td class="not_done">mac_core</td>
 <td class="done">sgi</td>
 </tr>
 
@@ -720,8 +711,8 @@ Note that these tests don't yet cover every feature of the V19 API. All of the t
 <td class="unknown">alsa</td>
 <td class="unknown">jack</td>
 <td class="unknown">oss</td>
-<td class="unknown">mac_sm</td>
-<td class="unknown">mac_core</td>
+<td class="not_done">mac_sm</td>
+<td class="not_done">mac_core</td>
 <td class="done">sgi</td>
 </tr>
 
@@ -732,8 +723,8 @@ Note that these tests don't yet cover every feature of the V19 API. All of the t
 <td class="unknown">alsa</td>
 <td class="unknown">jack</td>
 <td class="unknown">oss</td>
-<td class="unknown">mac_sm</td>
-<td class="unknown">mac_core</td>
+<td class="not_done">mac_sm</td>
+<td class="not_done">mac_core</td>
 <td class="done">sgi</td>
 </tr>
 
@@ -744,8 +735,8 @@ Note that these tests don't yet cover every feature of the V19 API. All of the t
 <td class="unknown">alsa</td>
 <td class="unknown">jack</td>
 <td class="unknown">oss</td>
-<td class="unknown">mac_sm</td>
-<td class="unknown">mac_core</td>
+<td class="not_done">mac_sm</td>
+<td class="not_done">mac_core</td>
 <td class="done">sgi</td>
 </tr>
 
@@ -756,8 +747,8 @@ Note that these tests don't yet cover every feature of the V19 API. All of the t
 <td class="unknown">alsa</td>
 <td class="unknown">jack</td>
 <td class="unknown">oss</td>
-<td class="unknown">mac_sm</td>
-<td class="unknown">mac_core</td>
+<td class="not_done">mac_sm</td>
+<td class="not_done">mac_core</td>
 <td class="done">sgi</td>
 </tr>
 
@@ -768,9 +759,21 @@ Note that these tests don't yet cover every feature of the V19 API. All of the t
 <td class="unknown">alsa</td>
 <td class="unknown">jack</td>
 <td class="unknown">oss</td>
-<td class="unknown">mac_sm</td>
-<td class="unknown">mac_core</td>
+<td class="not_done">mac_sm</td>
+<td class="not_done">mac_core</td>
 <td class="done">sgi</td>
+</tr>
+
+<tr><td>patest_mono.c</td><td> <span class="not_done">missing</span> </td>
+<td class="unknown">wmme</td>
+<td class="unknown">ds</td>
+<td class="unknown">asio</td>
+<td class="unknown">alsa</td>
+<td class="unknown">jack</td>
+<td class="unknown">oss</td>
+<td class="not_done">mac_sm</td>
+<td class="not_done">mac_core</td>
+<td class="unknown">sgi</td>
 </tr>
 
 <tr><td>patest_multi_sine.c</td><td> Play a different sine wave on each channel </td>
@@ -780,8 +783,8 @@ Note that these tests don't yet cover every feature of the V19 API. All of the t
 <td class="unknown">alsa</td>
 <td class="unknown">jack</td>
 <td class="unknown">oss</td>
-<td class="unknown">mac_sm</td>
-<td class="unknown">mac_core</td>
+<td class="not_done">mac_sm</td>
+<td class="not_done">mac_core</td>
 <td class="done">sgi</td>
 </tr>
 
@@ -792,8 +795,179 @@ Note that these tests don't yet cover every feature of the V19 API. All of the t
 <td class="unknown">alsa</td>
 <td class="unknown">jack</td>
 <td class="unknown">oss</td>
-<td class="unknown">mac_sm</td>
-<td class="unknown">mac_core</td>
+<td class="not_done">mac_sm</td>
+<td class="not_done">mac_core</td>
+<td class="done">sgi</td>
+</tr>
+
+<tr><td>patest_record.c</td><td> Record input into an array; Save array to a file; Playback recorded data </td>
+<td class="unknown">wmme</td>
+<td class="unknown">ds</td>
+<td class="unknown">asio</td>
+<td class="unknown">alsa</td>
+<td class="unknown">jack</td>
+<td class="unknown">oss</td>
+<td class="not_done">mac_sm</td>
+<td class="not_done">mac_core</td>
+<td class="done">sgi</td>
+</tr>
+
+<tr><td>patest_ringmix.c</td><td> Ring modulate inputs to left output, mix inputs to right output </td>
+<td class="unknown">wmme</td>
+<td class="unknown">ds</td>
+<td class="unknown">asio</td>
+<td class="unknown">alsa</td>
+<td class="unknown">jack</td>
+<td class="unknown">oss</td>
+<td class="not_done">mac_sm</td>
+<td class="not_done">mac_core</td>
+<td class="done">sgi</td>
+</tr>
+
+<tr><td>patest_saw.c</td><td> Play a simple (aliasing) sawtooth wave </td>
+<td class="unknown">wmme</td>
+<td class="unknown">ds</td>
+<td class="unknown">asio</td>
+<td class="unknown">alsa</td>
+<td class="unknown">jack</td>
+<td class="unknown">oss</td>
+<td class="not_done">mac_sm</td>
+<td class="not_done">mac_core</td>
+<td class="done">sgi</td>
+</tr>
+
+<tr><td>patest_sine.c</td><td> Play a sine wave for several seconds </td>
+<td class="unknown">wmme</td>
+<td class="unknown">ds</td>
+<td class="unknown">asio</td>
+<td class="unknown">alsa</td>
+<td class="unknown">jack</td>
+<td class="unknown">oss</td>
+<td class="not_done">mac_sm</td>
+<td class="not_done">mac_core</td>
+<td class="done">sgi</td>
+</tr>
+
+<tr><td>patest_sine8.c</td><td> Test 8 bit data: play a sine wave for several seconds</td>
+<td class="unknown">wmme</td>
+<td class="unknown">ds</td>
+<td class="unknown">asio</td>
+<td class="unknown">alsa</td>
+<td class="unknown">jack</td>
+<td class="unknown">oss</td>
+<td class="not_done">mac_sm</td>
+<td class="not_done">mac_core</td>
+<td class="done">sgi</td>
+</tr>
+
+<tr><td>patest_sine_formats.c</td><td> Play a sine wave for several seconds. Test various data formats </td>
+<td class="unknown">wmme</td>
+<td class="unknown">ds</td>
+<td class="unknown">asio</td>
+<td class="unknown">alsa</td>
+<td class="unknown">jack</td>
+<td class="unknown">oss</td>
+<td class="not_done">mac_sm</td>
+<td class="not_done">mac_core</td>
+<td class="done">sgi</td>
+</tr>
+
+<tr><td>patest_sine_time.c</td><td> Play a sine wave for several seconds, pausing in the middle. Uses the Pa_GetStreamTime() call </td>
+<td class="unknown">wmme</td>
+<td class="unknown">ds</td>
+<td class="unknown">asio</td>
+<td class="unknown">alsa</td>
+<td class="unknown">jack</td>
+<td class="unknown">oss</td>
+<td class="not_done">mac_sm</td>
+<td class="not_done">mac_core</td>
+<td class="done">sgi</td>
+</tr>
+
+<tr><td>patest_stop.c</td><td> Test different ways of stopping audio </td>
+<td class="unknown">wmme</td>
+<td class="unknown">ds</td>
+<td class="unknown">asio</td>
+<td class="unknown">alsa</td>
+<td class="unknown">jack</td>
+<td class="unknown">oss</td>
+<td class="not_done">mac_sm</td>
+<td class="not_done">mac_core</td>
+<td class="done">sgi</td>
+</tr>
+
+<tr><td>patest_sync.c</td><td> Test time stamping and synchronization of audio and video </td>
+<td class="unknown">wmme</td>
+<td class="unknown">ds</td>
+<td class="unknown">asio</td>
+<td class="unknown">alsa</td>
+<td class="unknown">jack</td>
+<td class="unknown">oss</td>
+<td class="not_done">mac_sm</td>
+<td class="not_done">mac_core</td>
+<td class="done">sgi</td>
+</tr>
+
+<tr><td>patest_toomanysines.c</td><td> Play more sine waves than we can handle in real time as a stress test </td>
+<td class="unknown">wmme</td>
+<td class="unknown">ds</td>
+<td class="unknown">asio</td>
+<td class="unknown">alsa</td>
+<td class="unknown">jack</td>
+<td class="unknown">oss</td>
+<td class="not_done">mac_sm</td>
+<td class="not_done">mac_core</td>
+<td class="done">sgi</td>
+</tr>
+
+<tr><td>patest_two_rates.c</td><td> <span class="not_done">missing</span> </td>
+<td class="unknown">wmme</td>
+<td class="unknown">ds</td>
+<td class="unknown">asio</td>
+<td class="unknown">alsa</td>
+<td class="unknown">jack</td>
+<td class="unknown">oss</td>
+<td class="not_done">mac_sm</td>
+<td class="not_done">mac_core</td>
+<td class="unknown">sgi</td>
+</tr>
+
+<tr><td>patest_underflow.c</td><td> Simulate an output buffer underflow condition. Tests whether the stream can be stopped when underflowing buffers</td>
+<td class="unknown">wmme</td>
+<td class="unknown">ds</td>
+<td class="unknown">asio</td>
+<td class="unknown">alsa</td>
+<td class="unknown">jack</td>
+<td class="unknown">oss</td>
+<td class="not_done">mac_sm</td>
+<td class="not_done">mac_core</td>
+<td class="done">sgi</td>
+</tr>
+
+<tr><td>patest_wire.c</td><td> Pass input directly to output </td>
+<td class="unknown">wmme</td>
+<td class="unknown">ds</td>
+<td class="unknown">asio</td>
+<td class="unknown">alsa</td>
+<td class="unknown">jack</td>
+<td class="unknown">oss</td>
+<td class="not_done">mac_sm</td>
+<td class="not_done">mac_core</td>
+<td class="done">sgi</td>
+</tr>
+
+
+<tr><td colspan="11"><b>New tests for V19</b></td></tr>
+
+<tr><td>patest_callbackstop.c</td><td> Test the paComplete callback result code </td>
+<td class="unknown">wmme</td>
+<td class="unknown">ds</td>
+<td class="unknown">asio</td>
+<td class="unknown">alsa</td>
+<td class="unknown">jack</td>
+<td class="unknown">oss</td>
+<td class="not_done">mac_sm</td>
+<td class="not_done">mac_core</td>
 <td class="done">sgi</td>
 </tr>
 
@@ -804,8 +978,8 @@ Note that these tests don't yet cover every feature of the V19 API. All of the t
 <td class="unknown">alsa</td>
 <td class="unknown">jack</td>
 <td class="unknown">oss</td>
-<td class="unknown">mac_sm</td>
-<td class="unknown">mac_core</td>
+<td class="not_done">mac_sm</td>
+<td class="not_done">mac_core</td>
 <td class="done">sgi</td>
 </tr>
 
@@ -817,92 +991,8 @@ patest_read_record.c</td><td> Record input into an array; Save array to a file; 
 <td class="unknown">alsa</td>
 <td class="unknown">jack</td>
 <td class="unknown">oss</td>
-<td class="unknown">mac_sm</td>
-<td class="unknown">mac_core</td>
-<td class="done">sgi</td>
-</tr>
-
-<tr><td>patest_record.c</td><td> Record input into an array; Save array to a file; Playback recorded data </td>
-<td class="unknown">wmme</td>
-<td class="unknown">ds</td>
-<td class="unknown">asio</td>
-<td class="unknown">alsa</td>
-<td class="unknown">jack</td>
-<td class="unknown">oss</td>
-<td class="unknown">mac_sm</td>
-<td class="unknown">mac_core</td>
-<td class="done">sgi</td>
-</tr>
-
-<tr><td>patest_ringmix.c</td><td> Ring modulate inputs to left output, mix inputs to right output </td>
-<td class="unknown">wmme</td>
-<td class="unknown">ds</td>
-<td class="unknown">asio</td>
-<td class="unknown">alsa</td>
-<td class="unknown">jack</td>
-<td class="unknown">oss</td>
-<td class="unknown">mac_sm</td>
-<td class="unknown">mac_core</td>
-<td class="done">sgi</td>
-</tr>
-
-<tr><td>patest_saw.c</td><td> Play a simple (aliasing) sawtooth wave </td>
-<td class="unknown">wmme</td>
-<td class="unknown">ds</td>
-<td class="unknown">asio</td>
-<td class="unknown">alsa</td>
-<td class="unknown">jack</td>
-<td class="unknown">oss</td>
-<td class="unknown">mac_sm</td>
-<td class="unknown">mac_core</td>
-<td class="done">sgi</td>
-</tr>
-
-<tr><td>patest_sine.c</td><td> Play a sine wave for several seconds </td>
-<td class="unknown">wmme</td>
-<td class="unknown">ds</td>
-<td class="unknown">asio</td>
-<td class="unknown">alsa</td>
-<td class="unknown">jack</td>
-<td class="unknown">oss</td>
-<td class="unknown">mac_sm</td>
-<td class="unknown">mac_core</td>
-<td class="done">sgi</td>
-</tr>
-
-<tr><td>patest_sine8.c</td><td> Test 8 bit data: play a sine wave for several seconds</td>
-<td class="unknown">wmme</td>
-<td class="unknown">ds</td>
-<td class="unknown">asio</td>
-<td class="unknown">alsa</td>
-<td class="unknown">jack</td>
-<td class="unknown">oss</td>
-<td class="unknown">mac_sm</td>
-<td class="unknown">mac_core</td>
-<td class="done">sgi</td>
-</tr>
-
-<tr><td>patest_sine_formats.c</td><td> Play a sine wave for several seconds. Test various data formats </td>
-<td class="unknown">wmme</td>
-<td class="unknown">ds</td>
-<td class="unknown">asio</td>
-<td class="unknown">alsa</td>
-<td class="unknown">jack</td>
-<td class="unknown">oss</td>
-<td class="unknown">mac_sm</td>
-<td class="unknown">mac_core</td>
-<td class="done">sgi</td>
-</tr>
-
-<tr><td>patest_sine_time.c</td><td> Play a sine wave for several seconds, pausing in the middle. Uses the Pa_GetStreamTime() call </td>
-<td class="unknown">wmme</td>
-<td class="unknown">ds</td>
-<td class="unknown">asio</td>
-<td class="unknown">alsa</td>
-<td class="unknown">jack</td>
-<td class="unknown">oss</td>
-<td class="unknown">mac_sm</td>
-<td class="unknown">mac_core</td>
+<td class="not_done">mac_sm</td>
+<td class="not_done">mac_core</td>
 <td class="done">sgi</td>
 </tr>
 
@@ -913,68 +1003,8 @@ patest_read_record.c</td><td> Record input into an array; Save array to a file; 
 <td class="unknown">alsa</td>
 <td class="unknown">jack</td>
 <td class="unknown">oss</td>
-<td class="unknown">mac_sm</td>
-<td class="unknown">mac_core</td>
-<td class="done">sgi</td>
-</tr>
-
-<tr><td>patest_stop.c</td><td> Test different ways of stopping audio </td>
-<td class="unknown">wmme</td>
-<td class="unknown">ds</td>
-<td class="unknown">asio</td>
-<td class="unknown">alsa</td>
-<td class="unknown">jack</td>
-<td class="unknown">oss</td>
-<td class="unknown">mac_sm</td>
-<td class="unknown">mac_core</td>
-<td class="done">sgi</td>
-</tr>
-
-<tr><td>patest_sync.c</td><td> Test time stamping and synchronization of audio and video </td>
-<td class="unknown">wmme</td>
-<td class="unknown">ds</td>
-<td class="unknown">asio</td>
-<td class="unknown">alsa</td>
-<td class="unknown">jack</td>
-<td class="unknown">oss</td>
-<td class="unknown">mac_sm</td>
-<td class="unknown">mac_core</td>
-<td class="done">sgi</td>
-</tr>
-
-<tr><td>patest_toomanysines.c</td><td> Play more sine waves than we can handle in real time as a stress test </td>
-<td class="unknown">wmme</td>
-<td class="unknown">ds</td>
-<td class="unknown">asio</td>
-<td class="unknown">alsa</td>
-<td class="unknown">jack</td>
-<td class="unknown">oss</td>
-<td class="unknown">mac_sm</td>
-<td class="unknown">mac_core</td>
-<td class="done">sgi</td>
-</tr>
-
-<tr><td>patest_underflow.c</td><td> Simulate an output buffer underflow condition. Tests whether the stream can be stopped when underflowing buffers</td>
-<td class="unknown">wmme</td>
-<td class="unknown">ds</td>
-<td class="unknown">asio</td>
-<td class="unknown">alsa</td>
-<td class="unknown">jack</td>
-<td class="unknown">oss</td>
-<td class="unknown">mac_sm</td>
-<td class="unknown">mac_core</td>
-<td class="done">sgi</td>
-</tr>
-
-<tr><td>patest_wire.c</td><td> Pass input directly to output </td>
-<td class="unknown">wmme</td>
-<td class="unknown">ds</td>
-<td class="unknown">asio</td>
-<td class="unknown">alsa</td>
-<td class="unknown">jack</td>
-<td class="unknown">oss</td>
-<td class="unknown">mac_sm</td>
-<td class="unknown">mac_core</td>
+<td class="not_done">mac_sm</td>
+<td class="not_done">mac_core</td>
 <td class="done">sgi</td>
 </tr>
 
@@ -985,9 +1015,33 @@ patest_read_record.c</td><td> Record input into an array; Save array to a file; 
 <td class="unknown">alsa</td>
 <td class="unknown">jack</td>
 <td class="unknown">oss</td>
-<td class="unknown">mac_sm</td>
-<td class="unknown">mac_core</td>
+<td class="not_done">mac_sm</td>
+<td class="not_done">mac_core</td>
 <td class="done">sgi</td>
+</tr>
+
+<tr><td>patest_in_overflow.c</td><td> Count input overflows (using paInputOverflow flag) under overloaded and normal conditions </td>
+<td class="done">wmme</td>
+<td class="not_done">ds</td>
+<td class="not_done">asio</td>
+<td class="not_done">alsa</td>
+<td class="not_done">jack</td>
+<td class="not_done">oss</td>
+<td class="not_done">mac_sm</td>
+<td class="not_done">mac_core</td>
+<td class="not_done">sgi</td>
+</tr>
+
+<tr><td>patest_out_underflow.c</td><td> Count output underflows (using paOutputUnderflow flag) under overloaded and normal conditions </td>
+<td class="done">wmme</td>
+<td class="not_done">ds</td>
+<td class="not_done">asio</td>
+<td class="not_done">alsa</td>
+<td class="not_done">jack</td>
+<td class="not_done">oss</td>
+<td class="not_done">mac_sm</td>
+<td class="not_done">mac_core</td>
+<td class="not_done">sgi</td>
 </tr>
 
 </table>
@@ -1007,4 +1061,4 @@ There are many ways in which you can help with V19 development. To begin with, s
 
 
 </BODY>
-</HTML>  l 
+</HTML>    
