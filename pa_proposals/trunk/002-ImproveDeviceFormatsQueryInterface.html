@@ -49,13 +49,27 @@ typedef struct PaDeviceInfo {
 
     unsigned int maxInputChannels;
     unsigned int maxOutputChannels; 
+
+    double defaultSampleRate;
 } PaDeviceInfo;
 </PRE>
 
 <P>
 The following fields have been removed from the above structure, relative to V18: 
-numSampleRates, sampleRates, nativeSampleFormats. Sample rate information will only
-be available by polling PortAudio using the Pa_IsFormatSupported() function defined below.
+numSampleRates, sampleRates, nativeSampleFormats. 
+</P>
+
+<P>
+Complete sample rate information will only be available by polling PortAudio using the Pa_IsFormatSupported() function defined below. The defaultSampleRate field is provided so that simple clients have access a known working sample rate, and so that host APIs that only support one possibly non-standard sample rate can expose it to clients. Implementations should use the following heuristics to determine which value to provide for defaultSampleRate when multiple rates are available:
+</P>
+
+<UL>
+<LI>The sample rate must be supported by the device.</LI>
+<LI>If more that one sample rate is supported, the one that is known to be supported with the most combinations of channel counts and duplex should be returned.</LI>
+<LI>Where possible, the sample rate should be at least CD quality (44.1k), if both 44.1k and higher rates are available, 44.1k should be used.</LI>
+</UL>
+
+<P>
 The concept of "native sample formats" - those that are directly supported by the underlying
 host API - will be removed from the PortAudio specification as PortAudio's conversion
 capabilities allow support for all PortAudio sample formats.
