@@ -17,7 +17,7 @@ content="PortAudio, audio, tutorial, library, portable, open-source, DirectSound
 
 <P><A href="index.html">Enhancement Proposals Index</A>,
 <A href="http://www.portaudio.com/">PortAudio Home Page</A></P>
-<P>Updated: August 24, 2002 </P>
+<P>Updated: October 5, 2002 </P>
 
 <H4>Overview</H4>
 
@@ -74,6 +74,20 @@ it may be desirable to retrieve pointers to these functions using a
 standard interface. This could be implemented in a number of ways.
 </P>
 
+
+<H4>Pa_OpenStream() Flag to Prime Initial Buffers Using the Stream Callback</H4>
+
+<P>
+Currently, when a stream is started, host buffers are initially filled with zeros (silence). This is done so that the Stream Callback: a) is called regularly (useful for time syncronisation), b) provides relatively constant latency from calback to output, and c) avoids a peak in processor load while a number of buffers are filled one after another. The downside of this strategy is that the startup latency is held constant, whereas some host APIs may be able to provide significantly lower startup latency if the initial buffers are filled with valid sample data.
+</P>
+
+<P>
+Although it is generally held that the above behavior is the most widely useful for streaming audio applications, a flag could be provided to Pa_OpenStream() to indicate that the buffers should initially be primed using the callback:
+</P>
+
+<PRE>
+paPrimeBuffersUsingCallback
+</PRE>
 
 </BODY>
 </HTML>
