@@ -17,27 +17,70 @@ content="PortAudio, audio, tutorial, library, portable, open-source, DirectSound
 
 <P><A href="index.html">Enhancement Proposals Index</A>,
 <A href="http://www.portaudio.com/">PortAudio Home Page</A></P>
-<P>Updated: July 23, 2002 </P>
+<P>Updated: August 9, 2002 </P>
 
 <H4>Status</H4>
 
-<P>This proposal is under construction.</P>
+<P>This proposal is under discussion.</P>
 
 <H4>Background</H4>
 
 <P>
 The information provided by the outTime callback parameter and Pa_StreamTime() function does
-not provide sufficient information to perform some syncronisation tasks such as syncronising
-PortAudio generated audio with another timebase (such as syncronisation pulses in a timestamped
-MIDI event stream.)
+not provide sufficient information to perform some syncronisation tasks. One example is that of syncronising
+PortAudio generated audio with another timebase, such as syncronisation pulses in a timestamped
+MIDI event stream.
 </P>
 
 <H4>Proposal</H4>
 
 <P>
-Remove Pa_StreamTime(). Provide a common time base ( Pa_GetTime() ) and pass three time parameters to the callback: current time, time at which the first sample of the input buffer was recieved, time at which the first sample of the output buffer will play, all relative to the Pa_GetTime() timebase.
+Remove the Pa_StreamTime(), as its functionality can be implemented using the features added by the 
+remainder of this proposal.
 </P>
 
+<P>
+Add a function to retrieve a stream's time base expressed in seconds. 
+It is unspecified what this timebase is relative to.
+</P>
+
+<PRE>
+typedef double PaTime;
+
+PaTime Pa_GetStreamTimeBase( PaStream *stream );
+</PRE>
+
+<P>
+Remove the current outTime parameter from the audio callback, and 
+replace it with a pointer to a PaCallbackTimeInfo structure which contains
+the time at which the first sample of the input buffer was received at the ADC input (inputBufferADCTime),
+the time at which the first sample of the output buffer will exit the DAC (outputBufferDACTime), 
+and the time at which the callback was initiated (currentTime). These times are all expressed
+in seconds relative to the stream's time base returned by Pa_GetStreamTimeBase().
+</P>
+
+<PRE>
+typedef struct PaCallbackTimeInfo{
+    PaTime inputBufferADCTime;
+    PaTime currentTime;
+    PaTime outputBufferDACTime,
+} PaCallbackTimeInfo;
+
+typedef int PortAudioCallback(
+      void *inputBuffer, void *outputBuffer,
+      unsigned long framesPerBuffer, PaCallbackTimeInfo *timeInfo,
+      unsigned long flags, void *userData);
+</PRE>
+
+<H4>Discussion</H4>
+
+<P>
+The possibility of retaining Pa_StreamTime() for clients which simply need to display the current stream time was discussed. It was suggested that the functionality currently provided by Pa_StreamTime() could be implemented using the new timestamp parameters, and that doing so would be more robust. One reason is because it is difficult to define a single useful behavior of Pa_StreamTime() in the presence of buffer overruns and underruns.
+</P>
+
+<P>
+Originally it was planned to have a global PortAudio timebase returned by a function named Pa_GetTime(). However, different host APIs on the same platform may dictate that their timebases are relative to different time sources (timeGetTime() vs. QueryPerformanceCounter() on windows for example.) Trying to syncronise multiple independent time bases is a problematic task (due to potential clock drift), so it was concluded that a safer approach would be to provide separate time bases for each stream.
+</P>
 
 <H4>Impact Analysis</H4>
 
