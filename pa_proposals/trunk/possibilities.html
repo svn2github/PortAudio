@@ -17,7 +17,7 @@ content="PortAudio, audio, tutorial, library, portable, open-source, DirectSound
 
 <P><A href="index.html">Enhancement Proposals Index</A>,
 <A href="http://www.portaudio.com/">PortAudio Home Page</A></P>
-<P>Updated: October 22, 2002 </P>
+<P>Updated: February 2, 2003 </P>
 
 <H4>Overview</H4>
 
@@ -36,6 +36,13 @@ Some PortAudio implementations (such as the V19 ASIO version) define
 additional functions which extend the PortAudio API. When PortAudio is dynamically linked
 it may be desirable to retrieve pointers to these functions using a 
 standard interface. This could be implemented in a number of ways.
+</P>
+
+
+<H4>Method for Retrieving Actual Callback Buffer Size</H4>
+
+<P>
+In V19, using paFramesPerBufferUnspecified (0) for the framesPerBuffer parameter to Pa_OpenStream() is recommended so that PortAudio uses an optimal (and possibly varying) number of frames. Some clients could benefit from being able to discover what this buffer size, or what the range of possible buffer sizes is. This could be handled by adding an additional field to PaStreamInfo called bufferSize, which is the callback buffer size in frames, or 0 if the buffer size is variable or unknown. Another possibility is to have both a minBufferSize and maxBufferSize field.
 </P>
 
 
