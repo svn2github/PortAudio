@@ -53,8 +53,8 @@ Pa_OpenStream() with pointers to PaStreamParameters structures.
 <PRE>
  PaError  Pa_OpenStream (
    PaStream **stream,
-   PaStreamParameters *inputParameters,
-   PaStreamParameters *outputParameters,
+   const PaStreamParameters *inputParameters,
+   const PaStreamParameters *outputParameters,
    double sampleRate,
    unsigned long framesPerBuffer,
    PaStreamFlags streamFlags,
@@ -70,8 +70,8 @@ to PaStreamParameters structures:
 
 <PRE>
 PaError Pa_IsFormatSupported(
-   PaStreamParameters *inputParameters,
-   PaStreamParameters *outputParameters,
+   const PaStreamParameters *inputParameters,
+   const PaStreamParameters *outputParameters,
    double sampleRate );
 </PRE>
 
