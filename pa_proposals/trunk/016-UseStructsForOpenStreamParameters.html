@@ -40,7 +40,7 @@ typedef struct PaStreamParameters{
      PaDeviceIndex device;
      int numChannels;
      PaSampleFormat sampleFormat;
-     PaTime latency;
+     PaTime suggestedLatency;
      void *hostApiSpecificStreamInfo;
 }PaStreamParameters;
 </PRE>
@@ -95,7 +95,7 @@ PaStreamParameters inputParameters;
 inputParameters.device = Pa_GetDefaultInputDevice();
 inputParameters.numChannels = 2;
 inputParameters.sampleFormat = paFloat32;
-inputParameters.latency = Pa_GetDefaultLowInputLatency( inputParameters.device );
+inputParameters.suggestedlatency = Pa_GetDefaultLowInputLatency( inputParameters.device );
 inputParameters.hostApiSpecificStreamInfo = NULL;
 </PRE>
 
