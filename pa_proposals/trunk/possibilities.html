@@ -17,7 +17,7 @@ content="PortAudio, audio, tutorial, library, portable, open-source, DirectSound
 
 <P><A href="index.html">Enhancement Proposals Index</A>,
 <A href="http://www.portaudio.com/">PortAudio Home Page</A></P>
-<P>Updated: October 5, 2002 </P>
+<P>Updated: October 22, 2002 </P>
 
 <H4>Overview</H4>
 
@@ -29,45 +29,6 @@ made about when or if these enhancements will be adopted.
 </P>
 
 
-<H4>Stream Finished Callback</H4>
-
-<P>
-PortAudio allows clients to terminate a stream by returning non-zero from the
-stream callback function. However, PortAudio cannot notify clients when the stream has
-actually completed playing all audio data. Currently the only methods of discovering
-whether a stream has actually finished playing is to poll Pa_IsStreamActive()
-or to wait for a blocking call to Pa_StopStream() to return. Some clients would 
-prefer to receive an asyncronous notification when the stream completes playing:
-</P>
-
-<PRE>
-typedef void PaStreamFinishedCallback( void *userData );
-
-/* register a callback function which will be called when a stream enters
- the Callback Finished state in response to the audio callback returning
- non-zero*/
-
-PaError Pa_SetStreamFinishedCallback( PaStream *stream, PaStreamFinishedCallback* streamFinishedCallback ); 
-</PRE>
-
-
-<H4>Version querying functions</H4>
-
-<P>
-Some clients could benefit from being able to determine which version of
-PortAudio is in use. This could be achieved using the following version 
-querying functions:
-</P>
-
-<PRE>
-/* return the release number of the currently running build of PortAudio, eg 1900 */
-int Pa_GetVersion();
-
-/* return a textual description of the current PortAudio build, eg "PortAudio V19-devel 13 October 2002" */
-const char* Pa_GetVersionText();
-</PRE>
-
-
 <H4>Standard Method for Retrieving Implementation-specific PortAudio Entry Points</H4>
 
 <P>
@@ -77,20 +38,6 @@ it may be desirable to retrieve pointers to these functions using a
 standard interface. This could be implemented in a number of ways.
 </P>
 
-
-<H4>Pa_OpenStream() Flag to Prime Initial Buffers Using the Stream Callback</H4>
-
-<P>
-Currently, when a stream is started, host buffers are initially filled with zeros (silence). This is done so that the Stream Callback: a) is called regularly (useful for time syncronisation), b) provides relatively constant latency from calback to output, and c) avoids a peak in processor load while a number of buffers are filled one after another. The downside of this strategy is that the startup latency is held constant, whereas some host APIs may be able to provide significantly lower startup latency if the initial buffers are filled with valid sample data.
-</P>
-
-<P>
-Although it is generally held that the above behavior is the most widely useful for streaming audio applications, a flag could be provided to Pa_OpenStream() to indicate that the buffers should initially be primed using the callback:
-</P>
-
-<PRE>
-paPrimeBuffersUsingCallback
-</PRE>
 
 </BODY>
 </HTML>

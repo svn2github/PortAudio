@@ -1,0 +1,74 @@
+<HTML>
+
+<HEAD>
+<TITLE>Proposed Changes to PortAudio</TITLE>
+<META content="Phil Burk, Ross Bencina" name=Author>
+<META content="Changes being discussed by the community of PortAudio deveopers." name=Description>
+<META 
+content="PortAudio, audio, tutorial, library, portable, open-source, DirectSound, sound, music, JSyn, AudioMulch, synthesis" name=KeyWords>
+</HEAD>
+
+<BODY LINK="#0000ff" VLINK="#800080">
+
+<CENTER>
+<H3>Proposed Enhancements to PortAudio API</H3>
+<H1>019 - Notify Client When All Buffers Have Played</H1>
+</CENTER>
+
+<P><A href="index.html">Enhancement Proposals Index</A>,
+<A href="http://www.portaudio.com/">PortAudio Home Page</A></P>
+<P>Updated: October 22, 2002 </P>
+
+<H4>Status</H4>
+
+<P>This proposal is open for discussion.</P>
+
+<H4>Background</H4>
+
+<P>
+PortAudio allows clients to terminate a stream by returning non-zero from the stream callback function. When the callback return value is paComplete, PortAudio will finish playing all generated audio data before deactivating the stream. PortAudio does not notify clients when the stream has actually completed playing all audio data. Currently the only methods of discovering whether a stream has actually finished playing is to poll Pa_IsStreamActive() or to wait for a blocking call to Pa_StopStream() to return. Some clients would prefer to receive an asyncronous notification when the stream completes playing.
+</P>
+
+<H4>Proposal</H4>
+
+<P>
+Define a callback that will be called when the stream finishes, and a function to register the callback with the stream.
+</P>
+
+<PRE>
+typedef void PaStreamFinishedCallback( void *userData );
+
+/** Register a callback function which will be called when a stream finishes
+ playing all queued audio data - this condition will arise after the stream 
+ callback returns non-zero, or when Pa_StopStream or Pa_AbortStream is called. 
+ If the stream callback returns paComplete, or Pa_StopStream is called, the 
+ stream finished callback will not be called until all generated sample data 
+ has been played. In the case of an input-only stream, the callback will be
+ called when the stream becomes inactive (ie once a call to Pa_StopStream() 
+ will not block.) Passing NULL for the streamFinishedCallback parameter 
+ un-registers a previously registered stream finished callback function.
+ Pa_SetStreamFinishedCallback must only be called when the stream is stopped,
+ otherwise an error will be returned.
+*/
+PaError Pa_SetStreamFinishedCallback( PaStream *stream, PaStreamFinishedCallback* streamFinishedCallback ); 
+</PRE>
+
+
+<H4>Discussion</H4>
+
+<P>
+The stream finished callback could be passed as a parameter to PaOpenStream, 
+this would make things more complicated for clients who don't need to use
+a stream finished callback. No clear decision has been made on this point yet.
+</P>
+
+
+<H4>Impact Analysis</H4>
+
+<P>
+This proposal adds new functionality and does not effect existing client code.
+</P>
+
+
+</BODY>
+</HTML>
