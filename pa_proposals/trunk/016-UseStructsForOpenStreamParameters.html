@@ -38,7 +38,7 @@ Define a new structure called PaStreamParameters:
 <PRE>
 typedef struct PaStreamParameters{
      PaDeviceIndex device;
-     int numberOfChannels;
+     int channelCount;
      PaSampleFormat sampleFormat;
      PaTime suggestedLatency;
      void *hostApiSpecificStreamInfo;
@@ -97,7 +97,7 @@ these structures as follows. Incedentally, the ability to write the following co
 <PRE>
 PaStreamParameters inputParameters;
 inputParameters.device = Pa_GetDefaultInputDevice();
-inputParameters.numberOfChannels = 2;
+inputParameters.channelCount = 2;
 inputParameters.sampleFormat = paFloat32;
 inputParameters.suggestedlatency = Pa_GetDefaultLowInputLatency( inputParameters.device );
 inputParameters.hostApiSpecificStreamInfo = NULL;
@@ -113,7 +113,7 @@ is still considered to be worthwhile.
 </P>
 
 <P>
-Originally the numberOfChannels field was called numChannels in line with the old Pa_OpenStream parameters of the same name. However it was discovered that this field was the only one in the whole api that used an abbreviation, so it was changed to numberOfChannels for consistency. Other abbreviations currently used are Info and Ptr, neither of these are field names. Further more, Info is a very common abbreviation (over 113 million appearances in google). There is an enumeration called PaErrorNum, but we are considering eliding this with PaError or renaming it PaErrorCode.
+Originally the channelCount field was called numChannels in line with the old Pa_OpenStream parameters of the same name. However it was discovered that this field was the only one in the whole api that used an abbreviation, so it was changed to channelCount for consistency. Other abbreviations currently used are Info and Ptr, neither of these are field names. Further more, Info is a very common abbreviation (over 113 million appearances in google). There is an enumeration called PaErrorNum, but we are considering eliding this with PaError or renaming it PaErrorCode.
 </P>
 
 <H4>Impact Analysis</H4>
