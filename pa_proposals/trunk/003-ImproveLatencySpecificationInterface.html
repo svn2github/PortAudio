@@ -17,7 +17,7 @@ content="PortAudio, audio, tutorial, library, portable, open-source, DirectSound
 
 <P><A href="index.html">Enhancement Proposals Index</A>,
 <A href="http://www.portaudio.com/">PortAudio Home Page</A></P>
-<P>Updated: December 3, 2002 </P>
+<P>Updated: September 18, 2003 </P>
 
 <H4>Status</H4>
 
@@ -65,9 +65,6 @@ typedef struct PaDeviceInfo {
 } PaDeviceInfo;
 </PRE>
 
-<P>
-The following functions will be supplied to retrieve default input and output latency values. Separate default latency values are provided for interactive applications where low latency is important to useful operation, and for robust applications where additional latency is acceptable if it will result in more stable performance or place a reduced load on the system.
-</P>
 
 <P>
 Currently, when numBuffers is greater than 0, Pa_OpenStream will constrain the actual numBuffers so that the latency is within a valid range determined by the host API, or an environment variables such as PA_MIN_LATENCY_MSEC. Propose changing the behavior so that the requested value is honored whenever possible. This will allow the user to override the recommended minimum latency if they know their system can handle it. This might be used, for example on patched Linux kernels.
