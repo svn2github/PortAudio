@@ -26,33 +26,32 @@ SPAN.unknown	{background-color:#FFFF88;}
 </CENTER>
 
 <P><A href="http://www.portaudio.com/">PortAudio Home Page</A></P>
-<P>Updated: September 18, 2003 </P>
+<P>Updated: September 19, 2003 </P>
 
 <H2>Background</H2>
 
 <P>
-For some years PortAudio development proceeded incrementally - fixing bugs and adding features. Around the time of the original V18 release in 2001 a big list of requested features existed, and there were many implementations of the PortAudio API, some with more cut-and-paste commonality than code sharing. Due to a combination of forces, most notably the desire to support multiple Host APIs in a single PortAudio build, it was decided to develop a new unified common infrastructure (support library) with which to implement V19. At that time the feature requests were developed into a set of change proposals which describe the new (Version 2.0) PortAudio API documented in portaudio.h. The proposals have been stable for some time (close to a year) and are available on the <a href="index.html">proposals page</a>. The common infrastructure is now largely implemented in the v19-devel CVS branch, and the version 2.0 API is well documented, and available as part of the v19-devel doxygen generated documentation available <a href="http://www.portaudio.com/docs/v19-doxydocs/">here</a>.
+For some years PortAudio development proceeded incrementally - bugs were fixed, new implementations were created and a few features were added. Around the time of the original V18 release in 2001 a big list of requested features existed, and there were many separate implementations of the PortAudio API, some with more cut-and-paste commonality than code sharing. Due to a combination of forces, most notably the desire to support multiple Host APIs in a single PortAudio build, it was decided to develop a new unified common infrastructure (support library) with which to implement V19. At that time the feature requests were developed into a set of <a href="index.html">enhancement proposals</a> which describe the new (Version 2.0) PortAudio API now documented in V19's <a href="http://www.portaudio.com/docs/v19-doxydocs/portaudio_8h.html">portaudio.h</a>. The proposals have been stable for some time (close to a year). The common infrastructure is now largely implemented in the <a href="http://www.portaudio.com/usingcvs.html">v19-devel CVS branch</a>, and the version 2.0 API is well documented, and available as part of the <a href="http://www.portaudio.com/docs/v19-doxydocs/">doxygen generated documentation</a>.
 </P>
 
-<P>Although each proposal is relatively small when taken in isolation, the overall scale of required changes from V18 to V19 is substantial. The new common infrastructure imposes a new interface for implementations. This new interface increases reliability and consistency and reduces development effort, but require considerable refactoring (some would say redevelopment) of existing PortAudio implementations relative to the V18 code base. 
+<P>Although each proposal is relatively small when taken in isolation, the overall scale of required changes from V18 to V19 is substantial. The new common infrastructure imposes a new interface for implementations. This new interface increases reliability and consistency and reduces development effort, but requires considerable refactoring (some would say redevelopment) of existing PortAudio implementations relative to the V18 code base. 
 </P>
 <P>
-At the time of writing, a substantial portion of V19 functionality has been implemented for Windows (MME, DirectSound, and ASIO) and for Linux (ALSA, OSS, and JACK) however no work has commenced on the other platforms which are well supported by V18 the Macintosh (SoundManager, CoreAudio) SGI (AL).
+At the time of writing, a substantial portion of V19 functionality has been implemented for Windows (MME, DirectSound, and ASIO) and for Linux (ALSA, OSS, and JACK) however no work has commenced on the other platforms which are well supported by V18: the Macintosh (SoundManager, CoreAudio) and SGI (AL).
 </P>
 <P>
-The amount of development work required to move from V18 release to V19 release has proven to be a significant impediment to completing the V19 release. In hindsight it may have been preferable to plan an incremental change schedule for migrating implementations from V18 to the new version 2.0 API. However hindsight is of little benefit to us now, and we need a plan to finalise the V19 release, the remainder of this document is part of that plan.
+The amount of development required to move from V18 release to V19 release has proven to be a significant obstacle to completing the V19 release. In hindsight it may have been preferable to plan an incremental change schedule for migrating implementations from V18 to the new version 2.0 API. However hindsight is of little benefit to us now, and we need a plan to finalise the V19 release, the remainder of this document is part of that plan.
 </P>
 
-<H2>Goals and Status Reporting</H2>
-
-<P>
-The list below attempts to clearly document the status of the current V19 development effort, in order to assist planning the V19 release. The original development status table was expressed in terms of the change proposals, some of which included multiple features. In some cases features were spread accross multiple change proposals. This new status table attempts to break the status down into finer grained features whose status can be easily verified. Developers are requested to report status to Ross Bencina (rossb@audiomulch.com), and to suggest new feature items. All unfinished features listed here, as well as other unfinished tasks should be listed as doxygen @todo items in the source code so that we can more easily track development status.
-</P>
-
 
 <H2>Implementation Status</H2>
+
+<P>
+The lists below attempt to clearly document the status of the current V19 development effort, in order to assist planning the V19 release. The original development status table was expressed in terms of the enhancement proposals, some of which included multiple features. In some cases features were spread accross multiple proposals. This new status table attempts to break the status down into finer grained features whose status can be easily verified. Developers are requested to report status to Ross Bencina (rossb@audiomulch.com), and to suggest new items for pending features not listed here. All unfinished features listed here, as well as other unfinished tasks should be listed as doxygen @todo items in the source code so that we can more easily track development status with the doxygen <a href="http://www.portaudio.com/docs/v19-doxydocs/todo.html">todo list</a>.
+</P>
+
 <p>
-Items marked <span class="done">green</span> have been implemented for that platform, <span class="unknown">yellow</span> are unknown, and <span class="not_done">red</span> are not implemented.
+Items marked <span class="done">green</span> have been implemented, <span class="unknown">yellow</span> are unknown, and <span class="not_done">red</span> are not implemented.
 </p>
 
 <H3>Public API</H3>
@@ -130,7 +129,7 @@ With some possible exceptions (such as (1) addition of new backward compatible s
 <H3>Host API Implementations</H3>
 
 <p>
-The list below describe API features which must be implemented by each implementation. In most cases the implementation status of these features will only effect clients who make use of these features, they do not effect the funtioning of other aspects of the API.
+The list below describe API features which must be implemented by each implementation. In most cases the implementation status of these features will only effect clients who make use of these features, they do not effect the functioning of other aspects of the API.
 </p>
 
 <p>
@@ -320,7 +319,7 @@ platform specific extension, not required<br>
 <span class="unknown">wmme</span>
 <span class="unknown">ds</span>
 <span class="unknown">asio</span>
-<span class="unknown">alsa</span>
+<span class="done">alsa</span>
 <span class="unknown">jack</span>
 <span class="unknown">oss</span>
 <span class="not_done">mac_sm</span>
@@ -331,7 +330,7 @@ platform specific extension, not required<br>
 <span class="unknown">wmme</span>
 <span class="unknown">ds</span>
 <span class="unknown">asio</span>
-<span class="unknown">alsa</span>
+<span class="not_done">alsa</span>
 <span class="unknown">jack</span>
 <span class="unknown">oss</span>
 <span class="not_done">mac_sm</span>
@@ -364,7 +363,7 @@ platform specific extension, not required<br>
 <span class="done">wmme</span>
 <span class="done">ds</span>
 <span class="done">asio</span>
-<span class="unknown">alsa</span>
+<span class="done">alsa</span>
 <span class="unknown">jack</span>
 <span class="unknown">oss</span>
 <span class="not_done">mac_sm</span>
@@ -375,7 +374,7 @@ platform specific extension, not required<br>
 <span class="done">wmme</span>
 <span class="not_done">ds</span>
 <span class="done">asio</span>
-<span class="unknown">alsa</span>
+<span class="done">alsa</span>
 <span class="unknown">jack</span>
 <span class="unknown">oss</span>
 <span class="not_done">mac_sm</span>
@@ -386,7 +385,7 @@ platform specific extension, not required<br>
 <span class="done">wmme</span>
 <span class="unknown">ds</span>
 <span class="done">asio</span>
-<span class="unknown">alsa</span>
+<span class="done">alsa</span>
 <span class="unknown">jack</span>
 <span class="unknown">oss</span>
 <span class="not_done">mac_sm</span>
@@ -397,7 +396,7 @@ platform specific extension, not required<br>
 <span class="done">wmme</span>
 <span class="unknown">ds</span>
 <span class="done">asio</span>
-<span class="unknown">alsa</span>
+<span class="done">alsa</span>
 <span class="unknown">jack</span>
 <span class="unknown">oss</span>
 <span class="not_done">mac_sm</span>
@@ -408,14 +407,14 @@ platform specific extension, not required<br>
 <span class="done">wmme</span>
 <span class="done">ds</span>
 <span class="done">asio</span>
-<span class="unknown">alsa</span>
+<span class="done">alsa</span>
 <span class="unknown">jack</span>
 <span class="unknown">oss</span>
 <span class="not_done">mac_sm</span>
 <span class="not_done">mac_core</span>
 <span class="not_done">sgi</span>
 
-<li>implement Pa_GetStreamTime() (see <a href="015-ImproveCallbackTimestampInfo.html">proposal 015</a>) **NOTE change proposal says stream time increases while stream is open, not just while running, not sure if alsa implementation observes this.<br> 
+<li>implement Pa_GetStreamTime() (see <a href="015-ImproveCallbackTimestampInfo.html">proposal 015</a>) **NOTE enhancement proposal says stream time increases while stream is open, not just while running, not sure if alsa implementation observes this.<br> 
 <span class="done">wmme</span>
 <span class="done">ds</span>
 <span class="done">asio</span>
@@ -442,7 +441,7 @@ platform specific extension, not required<br>
 <span class="done">wmme</span>
 <span class="done">ds</span>
 <span class="done">asio</span>
-<span class="unknown">alsa</span>
+<span class="not_done">alsa</span>
 <span class="not_done">jack</span>
 <span class="unknown">oss</span>
 <span class="not_done">mac_sm</span>
@@ -504,13 +503,13 @@ If there is a specific feature which has been implemented, but is not listed abo
 <H2>Where to From Here?</H2>
 
 <p>
-The above status report needs to be taken in the context of the V18 release, the features it implemented (and didn't implement), and the quality and consistency of its implementations. For example many features listed above were not part of the V18 API, some were not consistently implemented accross platforms on V18, and some bug-like items were also present in V18. It remains to be decided whether every item above must be marked complete before V19 is released. One option we are considering is to release V19 as soon as it can do everything V18 could do.
+The above status report needs to be taken in the context of the V18 release, the features it implemented (and didn't implement), and the quality and consistency of its implementations. For example many features listed above were not part of the V18 API, some were not consistently implemented accross all platforms, and some of the bug-like items were also present in V18. It remains to be decided whether every item above must be marked complete before V19 is released. One option we are considering is to release V19 as soon as it can do everything V18 could do.
 </p>
 
 <H2>How Can I Help?</H2>
 
 <p>
-There are many ways in which you can help with V19 development. To begin with, simply try using it - the more people that are using PortAudio V19, the more quickly we can find and fix problems. Read <a href="http://www.portaudio.com/docs/v19-doxydocs/">the documentation</a> and let us know if anything is confusing or unclear. Try compiling and running the tests which are known to work (see pa_tests/README.txt). Let us know about any problems you encounter. If you want to help out with development there are a number of simple tasks that you could work on, for example: write one of the missing sample converters in pa_converters.c, fix an existing test (see pa_tests/README.txt), or writing a new test. If you know something about one of the host APIs that we already support, why not review our code to see if we could be doing something better. There's also the <a href="http://www.portaudio.com/docs/v19-doxydocs/todo.html">todo list</a>. We're looking for developers to port the Macintosh and SGI versions from V18 to V19 - there's a template for new implementations in pa_skeleton.c and you can look to the existing MME, DirectSound, ASIO, ALSA and JACK implementations for guidance. It's always a good idea to in check with existing developers on the <a href="http://www.portaudio.com/contacts.html">mailing list</a> before beginning any large tasks.
+There are many ways in which you can help with V19 development. To begin with, simply try using it - the more people that use PortAudio V19, the more quickly we can find and fix problems. Read <a href="http://www.portaudio.com/docs/v19-doxydocs/">the documentation</a> and let us know if anything is confusing or unclear. Try compiling and running the tests which are known to work (see pa_tests/README.txt). Let us know about any problems you encounter. If you want to help out with development there are a number of simple tasks that you can work on, for example: write one of the missing sample converters in pa_converters.c, fix an existing test (see pa_tests/README.txt), or write a new test. If you know something about one of the host APIs that we already support, review our code to see if we could be doing something better. There's also the <a href="http://www.portaudio.com/docs/v19-doxydocs/todo.html">todo list</a>. We're looking for developers to port the Macintosh and SGI versions from V18 to V19 - there's a template for new implementations in pa_skeleton.c and you can look to the existing MME, DirectSound, ASIO, ALSA and JACK implementations for guidance. It's always a good idea to in check with existing developers on the <a href="http://www.portaudio.com/contacts.html">mailing list</a> before beginning a large task.
 </p>
 
 
