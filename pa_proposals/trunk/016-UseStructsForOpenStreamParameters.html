@@ -17,7 +17,7 @@ content="PortAudio, audio, tutorial, library, portable, open-source, DirectSound
 
 <P><A href="index.html">Enhancement Proposals Index</A>,
 <A href="http://www.portaudio.com/">PortAudio Home Page</A></P>
-<P>Updated: October 18, 2002 </P>
+<P>Updated: October 24, 2002 </P>
 
 <H4>Status</H4>
 
@@ -38,7 +38,7 @@ Define a new structure called PaStreamParameters:
 <PRE>
 typedef struct PaStreamParameters{
      PaDeviceIndex device;
-     int numChannels;
+     int numberOfChannels;
      PaSampleFormat sampleFormat;
      PaTime suggestedLatency;
      void *hostApiSpecificStreamInfo;
@@ -90,14 +90,14 @@ In cases where a PaStreamParameters pointer is supplied, its device field must N
 
 <P>
 Using structures to pack function parameters has the advantage of creating 
-more readable code, because clients will generally assign values to
-these structures as follows:
+more readable code, because clients can assign values to
+these structures as follows. Incedentally, the ability to write the following code in C was one of the reasons Bjarne Stroustrup gave for not adding named parameters to C++.
 </P>
 
 <PRE>
 PaStreamParameters inputParameters;
 inputParameters.device = Pa_GetDefaultInputDevice();
-inputParameters.numChannels = 2;
+inputParameters.numberOfChannels = 2;
 inputParameters.sampleFormat = paFloat32;
 inputParameters.suggestedlatency = Pa_GetDefaultLowInputLatency( inputParameters.device );
 inputParameters.hostApiSpecificStreamInfo = NULL;
@@ -112,6 +112,9 @@ for Pa_IsFormatSupported() parameters
 is still considered to be worthwhile. 
 </P>
 
+<P>
+Originally the numberOfChannels field was called numChannels in line with the old Pa_OpenStream parameters of the same name. However it was discovered that this field was the only one in the whole api that used an abbreviation, so it was changed to numberOfChannels for consistency. Other abbreviations currently used are Info and Ptr, neither of these are field names. Further more, Info is a very common abbreviation (over 113 million appearances in google). There is an enumeration called PaErrorNum, but we are considering eliding this with PaError or renaming it PaErrorCode.
+</P>
 
 <H4>Impact Analysis</H4>
 
