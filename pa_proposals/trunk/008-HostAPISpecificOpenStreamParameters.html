@@ -17,17 +17,16 @@ content="PortAudio, audio, tutorial, library, portable, open-source, DirectSound
 
 <P><A href="index.html">Enhancement Proposals Index</A>,
 <A href="http://www.portaudio.com/">PortAudio Home Page</A></P>
-<P>Updated: July 26, 2002 </P>
+<P>Updated: July 31, 2002 </P>
 
 
 <H4>Status</H4>
 
 <P>
-Although this proposal has been implemented in v19-devel, it still requires further discussion. 
-We need to decide whether the host-specific
-data associated with PaHostApiSpecificStreamInfo should immediately follow the PaHostApiSpecificStreamInfo or whether PaHostApiSpecificStreamInfo should contain a pointer to the host specific data. We should also consider whether it is worth defining a special constant paNullStreamInfo to be passed to the streamInfo parameters to Pa_OpenStream() when no stream info is being used.
-</P>
-
+This proposal is sufficiently well defined to be implemented. It has been partially implemented
+in v19-devel, however the current proposal no longer utilises the PaHostApiSpecificStreamInfo
+structure currently used in v19-devel.
+</P>
 <H4>Dependencies</H4>
 
 <P>
@@ -46,19 +45,32 @@ Pa_OpenStream has always had inputDriverInfo and outputDriverInfo parameters, wh
 <H4>Proposal</H4>
 
 <P>
-The following structure could be defined as a common header for all data structures passed to the inputDriverInfo and outputDriverInfo parameters of Pa_OpenStream:
+The inputDriverInfo and outputDriverInfo to Pa_OpenStream() will be renamed inputStreamInfo and outputStreamInfo.
+</P>
+
+<P>
+A special constant paNullStreamInfo will be defined, which can be used in the inputStreamInfo
+and outputStreamInfo parameters.
+</P
+
+<PRE>
+#define paNullStreamInfo ((void*)0)
+</P>
+
+<P>
+All data structures defined by implementations to be passed
+to the inputStreamInfo and outputStreamInfo parameters of Pa_OpenStream
+must begin with the following fields:
 </P>
 
 <PRE>
-struct{
-    unsigned long size;    /* size of whole structure including this header */
-    PaHostApiTypeId hostApiType; /* host API for which this data is intended */
-    unsigned long version; /* structure version */
-}PaHostApiSpecificStreamInfo;
+unsigned long size;    /* size of whole structure including this header */
+PaHostApiTypeId hostApiType; /* host API for which this data is intended */
+unsigned long version; /* structure version */
 </PRE>
 
 <P>
-The inputDriverInfo and outputDriverInfo to Pa_OpenStream() will be renamed inputStreamInfo and outputStreamInfo and will have their types changed from void* to PaHostApiSpecificStreamInfo*.
+The common infrastructure will expect these fields to be present, and to contain valid information.
 </P>
 
 
@@ -71,7 +83,10 @@ The following host API specific extensions will be placed in separate header fil
 <P>The following structure is proposed for passing device names to the OSS implementation:</P>
 <PRE>
 struct{
-    PaHostApiSpecificStreamInfo header;
+    unsigned long size;    /* size of whole structure including this header */
+	PaHostApiTypeId hostApiType; /* host API for which this data is intended */
+	unsigned long version; /* structure version */
+
     char *deviceName;
 }PaOSSSpecificStreamInfo;
 </PRE>
@@ -112,7 +127,9 @@ typedef struct PaWinMmeDeviceAndNumChannels{
 
 
 typedef struct PaWinMmeStreamInfo{
-    PaHostApiSpecificStreamInfo header;
+    unsigned long size;    /* size of whole structure including this header */
+	PaHostApiTypeId hostApiType; /* host API for which this data is intended */
+	unsigned long version; /* structure version */
 
     unsigned long flags;
 
@@ -146,7 +163,28 @@ typedef struct PaWinMmeStreamInfo{
 <H4>Discussion</H4>
 
 <P>
-Some objections were raised regarding changing the type of inputDriverInfo and outputDriverInfo from void* to PaHostAPISpecificInfo*, as this may require clients to explicitly cast to PaHostAPISpecificInfo* when passing NULL. However the added semantic and type safety advantages were considered more valuable.
+Originally this proposal involved declaring a common header structure which would
+be embedded at the head of each host-api specific stream info structure:
+</P>
+<PRE>
+struct{
+    unsigned long size;    /* size of whole structure including this header */
+    PaHostApiTypeId hostApiType; /* host API for which this data is intended */
+    unsigned long version; /* structure version */
+}PaHostApiSpecificStreamInfo;
+</PRE>
+
+<P>
+However, the unidiomatic type casts required to make the use of this structure transparent
+lead us to the current approach, where the presence of the header structure is 
+implicit.
+</P>
+
+<P>
+When PaHostApiSpecificStreamInfo was still declared, we intended to change the type of the
+streamInfor parameters from void* to PaHostApiSpecificStreamInfo*. Some objections were raised 
+to this, as it may have required clients to explicitly cast to PaHostAPISpecificInfo* when passing NULL. However the added semantic and type safety advantages were considered more valuable. The current
+proposal leaves these parameters as NULL.
 </P>
 
 <P>
@@ -164,3 +202,4 @@ This proposal provides access to new platform-specific extensions. No existing c
 
 </BODY>
 </HTML>
+ 
