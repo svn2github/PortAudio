@@ -51,23 +51,23 @@ PaTime Pa_GetStreamTime( PaStream *stream );
 
 <P>
 Remove the current outTime parameter from the audio callback, and 
-replace it with a pointer to a PaCallbackTimeInfo structure which contains
-the time at which the first sample of the input buffer was received at the ADC input (inputBufferADCTime),
-the time at which the first sample of the output buffer will exit the DAC (outputBufferDACTime), 
+replace it with a pointer to a PaStreamCallbackTimeInfo structure which contains
+the time at which the first sample of the input buffer was received at the ADC input (inputBufferAdcTime),
+the time at which the first sample of the output buffer will exit the DAC (outputBufferDacTime), 
 and the time at which the callback was initiated (currentTime). These times are all expressed
 in seconds based on the stream-specific clock returned by Pa_GetStreamTime().
 </P>
 
 <PRE>
-typedef struct PaCallbackTimeInfo{
-    PaTime inputBufferADCTime;
+typedef struct PaStreamCallbackTimeInfo{
+    PaTime inputBufferAdcTime;
     PaTime currentTime;
-    PaTime outputBufferDACTime,
-} PaCallbackTimeInfo;
+    PaTime outputBufferDacTime,
+} PaStreamCallbackTimeInfo;
 
 typedef int PortAudioCallback(
       void *inputBuffer, void *outputBuffer,
-      unsigned long framesPerBuffer, PaCallbackTimeInfo *timeInfo,
+      unsigned long framesPerBuffer, const PaStreamCallbackTimeInfo *timeInfo,
       unsigned long flags, void *userData);
 </PRE>
 
