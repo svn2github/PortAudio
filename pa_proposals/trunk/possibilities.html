@@ -1,0 +1,79 @@
+<HTML>
+
+<HEAD>
+<TITLE>Proposed Changes to PortAudio</TITLE>
+<META content="Phil Burk, Ross Bencina" name=Author>
+<META content="Changes being discussed by the community of PortAudio deveopers." name=Description>
+<META 
+content="PortAudio, audio, tutorial, library, portable, open-source, DirectSound, sound, music, JSyn, AudioMulch, synthesis" name=KeyWords>
+</HEAD>
+
+<BODY LINK="#0000ff" VLINK="#800080">
+
+<CENTER>
+<H3>Proposed Enhancements to PortAudio API</H3>
+<H1>Potential Enhancements</H1>
+</CENTER>
+
+<P><A href="index.html">Enhancement Proposals Index</A>,
+<A href="http://www.portaudio.com/">PortAudio Home Page</A></P>
+<P>Updated: August 24, 2002 </P>
+
+<H4>Overview</H4>
+
+<P>
+This page documents potential enhancements to PortAudio which have been 
+suggested, but not yet developed into concrete proposals. Enhancements listed
+here may be considered for future versions of PortAudio but no guarantees are
+made about when or if these enhancements will be adopted.
+</P>
+
+
+<H4>Stream Finished Callback</H4>
+
+<P>
+PortAudio allows clients to terminate a stream by returning non-zero from the
+stream callback function. However, PortAudio cannot notify clients when the stream has
+actually completed playing all audio data. Currently the only methods of discovering
+whether a stream has actually finished playing is to poll Pa_IsStreamActive()
+or to wait for a blocking call to Pa_StopStream() to return. Some clients would 
+prefer to receive an asyncronous notification when the stream completes playing:
+</P>
+
+<PRE>
+typedef void PaStreamFinishedCallback( void *userData );
+
+/* register a callback function which will be called when a stream enters
+ the Callback Finished state in response to the audio callback returning
+ non-zero*/
+
+PaError Pa_SetStreamFinishedCallback( PaStream *stream, PaStreamFinishedCallback* streamFinishedCallback ); 
+</PRE>
+
+
+<H4>Pa_GetVersion() Function</H4>
+
+<P>
+Some clients could benefit from being able to determine which version of
+PortAudio is in use. This could be achieved using the following version 
+querying function:
+</P>
+
+<PRE>
+/* return the release number of the currently running build of PortAudio */
+int Pa_GetVersion();
+</PRE>
+
+
+<H4>Standard Method for Retrieving Implementation-specific PortAudio Entry Points</H4>
+
+<P>
+Some PortAudio implementations (such as the V19 ASIO version) define 
+additional functions which extend the PortAudio API. When PortAudio is dynamically linked
+it may be desirable to retrieve pointers to these functions using a 
+standard interface. This could be implemented in a number of ways.
+</P>
+
+
+</BODY>
+</HTML>
