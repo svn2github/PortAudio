@@ -17,15 +17,12 @@ content="PortAudio, audio, tutorial, library, portable, open-source, DirectSound
 
 <P><A href="index.html">Enhancement Proposals Index</A>,
 <A href="http://www.portaudio.com/">PortAudio Home Page</A></P>
-<P>Updated: July 23, 2002 </P>
-
-<H2><A NAME="AllowCallbackVariableFramesPerBuffer">Allow Callbacks to Accept Variable framesPerBuffer</A></H2>
+<P>Updated: July 31, 2002 </P>
 
 <H4>Status</H4>
 
 <P>
-This proposal sufficiently defined to be implemented. The current v19-devel branch implements passing 0 for the framesPerCallback (framesPerBuffer) parameter to indicate "don't care", however the paFramesPerBufferUnspecified constant has not been defined. We need to decide whether the paFramesPerBufferUnspecified constant will be provided at all, and if provided whether it should retain its name or have different one, such as paVariableFramesPerBuffer. There is still some discussion about whether the Pa_OpenStream() parameter should be called framesPerBuffer, framesPerCallback, granularityFrames, framesPerBlock or something else (see this thread for details: <A HREF="http://techweb.rfa.org/pipermail/portaudio/2002-July/000889.html">http://techweb.rfa.org/pipermail/portaudio/2002-July/000889.html</A> ) The name of this parameter 
-needs to reflect the fact that it is also used as a preferred granularity specifier for blocking read/write streams.
+This proposal sufficiently defined to be implemented. The current v19-devel branch implements passing 0 for Pa_OpenStream's framesPerBuffer parameter to indicate "don't care", however the paFramesPerBufferUnspecified constant has not been defined. 
 </P>
 
 <H4>Background</H4>
@@ -55,11 +52,11 @@ With some host APIs, the use of non-zero framesPerBuffer for a callback stream m
 </I></P>
 
 <P>
-To make the code more obvious, a special constant could be defined:<BR>
+To make the code more obvious, a special constant will be defined:<BR>
 </P>
 
 <PRE>
-#define paFramesPerBufferUnspecified (0)<BR>
+#define paFramesPerBufferUnspecified (0)
 </PRE>
 
 
@@ -76,6 +73,12 @@ int Pa_GetStreamFramesPerBuffer( PaStream* stream );
 <P>
 However it was concluded that it would be more flexible to allow the number of frames passed to the callback to vary from one call to the next. Some APIs (JACK?) were identified which made no guarantees about the number of frames per buffer, and some implementations can provide different buffer sizes for each callback under certain circumstances (consider circular buffer wraparound in DirectSound for example.)
 </P>
+
+<P>
+The name paVariableFramesPerBuffer was considered as an alternative to 
+paFramesPerBufferUnspecified, however it was deemed to make it unclear whether PortAudio or the client determined the buffer size variation.
+</P>
+
 
 <H4>Impact Analysis</H4>
 
