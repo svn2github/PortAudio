@@ -17,12 +17,12 @@ content="PortAudio, audio, tutorial, library, portable, open-source, DirectSound
 
 <P><A href="index.html">Enhancement Proposals Index</A>,
 <A href="http://www.portaudio.com/">PortAudio Home Page</A></P>
-<P>Updated: July 30, 2002 </P>
+<P>Updated: October 19, 2002 </P>
 
 <H4>Status</H4>
 
 <P>
-This proposal is sufficiently well defined to be implemented. The current V19 implementation is not up to date (it uses frames instead of seconds for the suggestedInputLatency and suggestedOuputLatency parameters to Pa_OpenStream, and doesn't provide the default latency or latency querying functions.)
+This proposal is sufficiently well defined to be implemented. It is implemented in the v19-devel branch.
 </P>
 
 <H4>Background</H4>
@@ -32,7 +32,7 @@ The current mechanism for setting latency is not considered optimal by all clien
 </P>
 
 <P>
-A related issue is the need to improve the interface available to determine default latency parameters. The most recent proposal is documented below, however there is still some debate as to whether this is satisfactory. 
+A related issue is the need to improve the interface available to determine default latency parameters - both for simple applications that just want to use the default values, and for applications that want to give user's the ability to tune latency values starting from sane defaults.
 </P>
 
 <P>
@@ -43,24 +43,34 @@ See this thread: <A HREF="http://techweb.rfa.org/pipermail/portaudio/2001-Octobe
 <H4>Proposal</H4>
 
 <P>
-The numBuffers parameter to Pa_OpenStream() will be removed, and replaced by two new parameters suggestedInputLatency and suggestedOutputLatency, both expressed in seconds. These parameters allow clients to fine-tune latency in a portable manner. Where practical PortAudio implementations should select buffer sizes based on these parameters, otherwise they may choose the closest viable buffer size and latency instead. In such cases the PortAudio implementations should round-up (ie always provide an equal or higher latency than requested.) 
+The numBuffers parameter to Pa_OpenStream() will be removed, and replaced by two new parameters suggestedInputLatency and suggestedOutputLatency, both expressed in seconds. These parameters allow clients to fine-tune latency in a portable manner. Where practical, PortAudio implementations should select buffer sizes based on these parameters, otherwise they may choose the closest viable buffer size and latency instead. Unless the suggested latency is greater than the upper limit for the device, PortAudio implementations should aim to round the suggestedLatency up to the next practial value - ie to provide an equal or higher latency than requested whereever possibe. 
 </P>
+
+<P>
+The following fields will be added to PaDevice info to expose the default input and output latency values for each device. Separate default latency values are provided for (1) interactive applications where low latency is important to useful operation (defaultLowInputLatency, defaultLowOutputLatency), and (2) robust applications where additional latency is acceptable if it will result in more stable performance or place a reduced load on the system (defaultHighInputLatcncy, defaultHighOutputLatency).
+</P>
+
+<PRE>
+typedef double PaTime; /* time expressed in seconds */
+
+typedef struct PaDeviceInfo {
+...
+    /* Default latency values for interactive performance. */
+    PaTime defaultLowInputLatency;
+    PaTime defaultLowOutputLatency;
+    /* Default latency values for robust non-interactive applications (eg. playing sound files). */
+    PaTime defaultHighInputLatency;
+    PaTime defaultHighOutputLatency;
+...
+} PaDeviceInfo;
+</PRE>
 
 <P>
 The following functions will be supplied to retrieve default input and output latency values. Separate default latency values are provided for interactive applications where low latency is important to useful operation, and for robust applications where additional latency is acceptable if it will result in more stable performance or place a reduced load on the system.
 </P>
 
-<PRE> 
-typedef double PaTime; /* time expressed in seconds */
-
-PaTime Pa_GetDefaultLowInputLatency( PaDeviceIndex deviceID ); /* For interactive performance. */
-PaTime Pa_GetDefaultHighInputLatency( PaDeviceIndex deviceID ); /* For playing sound files. */
-PaTime Pa_GetDefaultLowOutputLatency( PaDeviceIndex deviceID ); /* For interactive performance. */
-PaTime Pa_GetDefaultHighOutputLatency( PaDeviceIndex deviceID ); /* For playing sound files. */
-</PRE>
-
 <P>
-Currently, when numBuffers is greater than 0, Pa_OpenStream will constrain the actual numBuffers so that the latency is within a valid range determined by the host API, or an environment variables such as PA_MIN_LATENCY_MSEC. Propose changing the behavior so that the requested value is honored as much as possible. This will allow the user to override the recommended minimum latency if they know their system can handle it. This might be used, for example on patched Linux kernels.
+Currently, when numBuffers is greater than 0, Pa_OpenStream will constrain the actual numBuffers so that the latency is within a valid range determined by the host API, or an environment variables such as PA_MIN_LATENCY_MSEC. Propose changing the behavior so that the requested value is honored whenever possible. This will allow the user to override the recommended minimum latency if they know their system can handle it. This might be used, for example on patched Linux kernels.
 </P>
 
 <P>
@@ -93,8 +103,21 @@ In cases where Host API specific latency parameters may be limited to certain al
 <H4>Discussion</H4>
 
 <P>
-This proposal provides both a high level mechanism for portable latency tuning, and suggests a method for providing a host-API specific latency tuning interface. Default latency query functions are provided to support simple portable applications.
+This proposal provides both a high level mechanism for portable latency tuning, and suggests a method for providing a host-API specific latency tuning interface. Default latency query functions are provided to support simple portable applications, and to provide starting values for applications that present a generic latency tuning user interface.
 </P>
+
+<P>
+Originally default latency values were retrieved using query functions listed below, however providing these values in the PaDeviceInfo structure seemed like a more natural fit to the rest of the API.
+</P>
+
+<PRE> 
+typedef double PaTime; /* time expressed in seconds */
+
+PaTime Pa_GetDefaultLowInputLatency( PaDeviceIndex deviceID ); /* For interactive performance. */
+PaTime Pa_GetDefaultHighInputLatency( PaDeviceIndex deviceID ); /* For playing sound files. */
+PaTime Pa_GetDefaultLowOutputLatency( PaDeviceIndex deviceID ); /* For interactive performance. */
+PaTime Pa_GetDefaultHighOutputLatency( PaDeviceIndex deviceID ); /* For playing sound files. */
+</PRE>
 
 <P>
 Expressing suggestedLatency in frames was considered, but rejected because it makes sense to return the actual latency from Pa_GetStreamInputLatency() in seconds, and being consistent was deemed to be important for clarity and avoiding usage errors.
