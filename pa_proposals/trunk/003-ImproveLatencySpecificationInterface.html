@@ -17,7 +17,7 @@ content="PortAudio, audio, tutorial, library, portable, open-source, DirectSound
 
 <P><A href="index.html">Enhancement Proposals Index</A>,
 <A href="http://www.portaudio.com/">PortAudio Home Page</A></P>
-<P>Updated: October 19, 2002 </P>
+<P>Updated: December 3, 2002 </P>
 
 <H4>Status</H4>
 
@@ -74,13 +74,54 @@ Currently, when numBuffers is greater than 0, Pa_OpenStream will constrain the a
 </P>
 
 <P>
-The following two functions are proposed to retrieve the input and output latency of a stream. Both return the latency in seconds.
+A method will be provided to retrieve the actual input and output latency of a stream. The following is proposed: A new PaStreamInfo structure will be defined along with a Pa_GetStreamInfo() function as follows:
 </P>
 
 <PRE>
-/* the following would operate directly on streams */
-PaTime Pa_GetStreamInputLatency( PaStream *stream );
-PaTime Pa_GetStreamOutputLatency( PaStream *stream );
+/** A structure containing unchanging information about an open stream.
+ @see Pa_GetStreamInfo
+*/
+
+typedef struct PaStreamInfo
+{
+    /** this is struct version 1 */
+    int structVersion;
+
+    /** The input latency of the stream in seconds. This value provides the most
+     accurate estimate of input latency available to the implementation. It may
+     differ significantly from the suggestedLatency value passed to Pa_OpenStream().
+     The value of this field will be zero (0.) for output-only streams.
+     @see PaTime
+    */
+    PaTime inputLatency;
+
+    /** The output latency of the stream in seconds. This value provides the most
+     accurate estimate of output latency available to the implementation. It may
+     differ significantly from the suggestedLatency value passed to Pa_OpenStream().
+     The value of this field will be zero (0.) for input-only streams.
+     @see PaTime
+    */
+    PaTime outputLatency;
+
+	... (other fields) ...
+    
+} PaStreamInfo;
+
+
+/** Retrieve a pointer to a PaStreamInfo structure containing information
+ about the specified stream.
+ @return A pointer to an immutable PaStreamInfo structure. If the stream
+ parameter invalid, or an error is encountered, the function returns NULL.
+
+ @param stream A pointer to an open stream previously created with Pa_OpenStream.
+
+ @note PortAudio manages the memory referenced by the returned pointer,
+ the client must not manipulate or free the memory. The pointer is only
+ guaranteed to be valid until the specified stream is closed.
+
+ @see PaStreamInfo
+*/
+const PaStreamInfo* Pa_GetStreamInfo( PaStream *stream );
 </PRE>
 
 <P>
@@ -122,6 +163,19 @@ PaTime Pa_GetDefaultHighOutputLatency( PaDeviceIndex deviceID ); /* For playing 
 <P>
 Expressing suggestedLatency in frames was considered, but rejected because it makes sense to return the actual latency from Pa_GetStreamInputLatency() in seconds, and being consistent was deemed to be important for clarity and avoiding usage errors.
 </P>
+
+
+
+<P>
+Initially the following two functions were proposed to retrieve the actual input and output latency of a stream. However, the potential need to retrieve additional information about a stream was identified, and so the PaStreamInfo structure was introduced instead.
+</P>
+
+<PRE>
+/* the following would operate directly on streams */
+PaTime Pa_GetStreamInputLatency( PaStream *stream );
+PaTime Pa_GetStreamOutputLatency( PaStream *stream );
+</PRE>
+
 
 <H4>Impact Analysis</H4>
 
