@@ -46,5 +46,16 @@ In V19, using paFramesPerBufferUnspecified (0) for the framesPerBuffer parameter
 </P>
 
 
+<H4>Method for Retrieving Channel Description Strings</H4>
+
+<P>
+Some host APIs (ASIO and CoreAudio) provide text strings describing each channel of a device. This information is especially useful for multichannel devices where the client may wish to display each device name to the user. The following new API calls have been proposed, these functions would return NULL if no string was available.
+</P>
+
+<PRE>
+const char *Pa_GetInputChannelDescriptionString( DeviceIndex device, int channel );
+const char *Pa_GetOutputChannelDescriptionString( DeviceIndex device, int channel );
+</PRE>
+
 </BODY>
 </HTML>
