@@ -86,8 +86,8 @@ paFormatIsSupported is provided to compare against the return value.
 #define paFormatIsSupported (0)
 
 PaError Pa_IsFormatSupported(
-   PaStreamParameters *inputParameters,
-   PaStreamParameters *outputParameters,
+   const PaStreamParameters *inputParameters,
+   const PaStreamParameters *outputParameters,
    double sampleRate );
 </PRE>
 
