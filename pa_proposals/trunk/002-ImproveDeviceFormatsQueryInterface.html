@@ -70,6 +70,10 @@ Complete sample rate information will only be available by polling PortAudio usi
 </UL>
 
 <P>
+If the implementation must poll for available rates, the following search order could be used to select the defaultSampleRate: 44100.0, 48000.0, 32000.0, 24000.0, 22050.0, 88200.0, 96000.0, 192000.0, 16000.0, 12000.0, 11025.0, 96000.0, 8000.0.
+</P>
+
+<P>
 The concept of "native sample formats" - those that are directly supported by the underlying
 host API - will be removed from the PortAudio specification as PortAudio's conversion
 capabilities allow support for all PortAudio sample formats.
