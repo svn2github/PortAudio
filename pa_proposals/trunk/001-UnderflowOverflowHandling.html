@@ -17,7 +17,7 @@ content="PortAudio, audio, tutorial, library, portable, open-source, DirectSound
 
 <P><A href="index.html">Enhancement Proposals Index</A>,
 <A href="http://www.portaudio.com/">PortAudio Home Page</A></P>
-<P>Updated: July 23, 2002 </P>
+<P>Updated: October 26, 2002 </P>
 
 <H4>Status</H4>
 
@@ -53,25 +53,27 @@ For streams providing input, the inputBuffer parameter will always point to a va
 </P>
 
 <P>
-A new parameter will be added to the Stream Callback Function that gives the status of the data as bit flags. 
+A new parameter and corresponding type will be added to the Stream Callback Function that gives the status of the data as bit flags. 
 </P>
 
 <PRE>
+typedef unsigned long PaStreamCallbackFlags;
+
 typedef int (PaStreamCallback)(
   void *inputBuffer, void *outputBuffer,
   unsigned long framesPerBuffer,
   PaTimestamp outTime, 
-  unsigned long statusFlags,
+  PaStreamCallbackFlags statusFlags,
   void *userData );
 </PRE>
 
 <P>The following bits may be set in the statusFlags parameter. </P>
 
 <PRE>
-#define paInputUnderflow&nbsp;&nbsp; (1&lt;&lt;0) /* Input data is all zeros because no real data is available. */ 
-#define paInputOverflow    (1&lt;&lt;1) /* Input data was discarded by PortAudio */
-#define paOutputUnderflow  (1&lt;&lt;2) /* Output data was inserted by PortAudio because the callback is using too much CPU */
-#define paOutputOverflow   (1&lt;&lt;3) /* Output data will be discarded because no room is available. */</PRE>
+#define paInputUnderflow&nbsp;&nbsp; ((PaStreamCallbackFlags)0x01) /* Input data is all zeros because no real data is available. */ 
+#define paInputOverflow    ((PaStreamCallbackFlags)0x02) /* Input data was discarded by PortAudio */
+#define paOutputUnderflow  ((PaStreamCallbackFlags)0x04) /* Output data was inserted by PortAudio because the callback is using too much CPU */
+#define paOutputOverflow   ((PaStreamCallbackFlags)0x08) /* Output data will be discarded because no room is available. */</PRE>
 
 <P>New rules will govern when the Stream Callback is called:</P>
 
