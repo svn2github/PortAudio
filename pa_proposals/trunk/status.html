@@ -1,0 +1,518 @@
+<HTML>
+
+<HEAD>
+<TITLE>PortAudio Development Status</TITLE>
+<META content="Phil Burk, Ross Bencina" name=Author>
+<META content="Status of current PortAudio development." name=Description>
+<META 
+content="PortAudio, audio, tutorial, library, portable, open-source, DirectSound, sound, music, JSyn, AudioMulch, synthesis" name=KeyWords>
+
+
+<STYLE>
+<!--
+SPAN.done 		{background-color:#BBFFEE;}
+SPAN.not_done	{background-color:#FF88BB;}
+SPAN.unknown	{background-color:#FFFF88;}
+-->
+</STYLE>
+
+
+</HEAD>
+
+<BODY LINK="#0000ff" VLINK="#800080">
+
+<CENTER>
+<H1>PortAudio V19 Development Status</H1>
+</CENTER>
+
+<P><A href="http://www.portaudio.com/">PortAudio Home Page</A></P>
+<P>Updated: September 18, 2003 </P>
+
+<H2>Background</H2>
+
+<P>
+For some years PortAudio development proceeded incrementally - fixing bugs and adding features. Around the time of the original V18 release in 2001 a big list of requested features existed, and there were many implementations of the PortAudio API, some with more cut-and-paste commonality than code sharing. Due to a combination of forces, most notably the desire to support multiple Host APIs in a single PortAudio build, it was decided to develop a new unified common infrastructure (support library) with which to implement V19. At that time the feature requests were developed into a set of change proposals which describe the new (Version 2.0) PortAudio API documented in portaudio.h. The proposals have been stable for some time (close to a year) and are available on the <a href="index.html">proposals page</a>. The common infrastructure is now largely implemented in the v19-devel CVS branch, and the version 2.0 API is well documented, and available as part of the v19-devel doxygen generated documentation available <a href="http://www.portaudio.com/docs/v19-doxydocs/">here</a>.
+</P>
+
+<P>Although each proposal is relatively small when taken in isolation, the overall scale of required changes from V18 to V19 is substantial. The new common infrastructure imposes a new interface for implementations. This new interface increases reliability and consistency and reduces development effort, but require considerable refactoring (some would say redevelopment) of existing PortAudio implementations relative to the V18 code base. 
+</P>
+<P>
+At the time of writing, a substantial portion of V19 functionality has been implemented for Windows (MME, DirectSound, and ASIO) and for Linux (ALSA, OSS, and JACK) however no work has commenced on the other platforms which are well supported by V18 the Macintosh (SoundManager, CoreAudio) SGI (AL).
+</P>
+<P>
+The amount of development work required to move from V18 release to V19 release has proven to be a significant impediment to completing the V19 release. In hindsight it may have been preferable to plan an incremental change schedule for migrating implementations from V18 to the new version 2.0 API. However hindsight is of little benefit to us now, and we need a plan to finalise the V19 release, the remainder of this document is part of that plan.
+</P>
+
+<H2>Goals and Status Reporting</H2>
+
+<P>
+The list below attempts to clearly document the status of the current V19 development effort, in order to assist planning the V19 release. The original development status table was expressed in terms of the change proposals, some of which included multiple features. In some cases features were spread accross multiple change proposals. This new status table attempts to break the status down into finer grained features whose status can be easily verified. Developers are requested to report status to Ross Bencina (rossb@audiomulch.com), and to suggest new feature items. All unfinished features listed here, as well as other unfinished tasks should be listed as doxygen @todo items in the source code so that we can more easily track development status.
+</P>
+
+
+<H2>Implementation Status</H2>
+<p>
+Items marked <span class="done">green</span> have been implemented for that platform, <span class="unknown">yellow</span> are unknown, and <span class="not_done">red</span> are not implemented.
+</p>
+
+<H3>Public API</H3>
+
+<p>
+With some possible exceptions (such as (1) addition of new backward compatible structure fields, (2) additional error codes, and (3) documentation refinements), the API defined in <a href="http://www.portaudio.com/docs/v19-doxydocs/portaudio_8h.html">portaudio.h</a> is complete and will not change between now and the V19 release. For this reason, clients who wish to use V19 now and take advantage of the existing functionality may safely do so without hazard of major changes between now and the final V19 release.
+</p>
+
+<H3>Common Infrastructure</H3>
+
+<ul>
+<li>Internal interface documentation (need to finish pa_process.h documentation) 
+<span class="not_done">todo</span>
+
+<li>timeInfo->currentTime not implemented in PaUtil_BeginBufferProcessing()
+<span class="not_done">todo</span>
+
+<li>Tests (some tests from V18 have not been converted to use the V19 API, see README.txt in the pa_tests directory)
+<span class="not_done">todo</span>
+
+<li>Priming stream with callback not supported by the complex adaption buffer adapter
+<span class="not_done">todo</span>
+
+<li>Some conversion functions (primarily those to and from 8 bit formats) are not yet implemented in pa_converters.c (some are also marked REVIEW)
+<span class="not_done">todo</span>
+
+<li>Underflow/overflow flags underspecified interaction with the callback adapter when buffer adaption is being used.
+<span class="not_done">todo</span>
+
+<li>No way to query the buffer adaptor about the amount of latency it introduces
+<span class="not_done">todo</span>
+
+<li>Should dithering always force clipping? (it did in V18)
+<span class="not_done">todo</span>
+
+<li>Improve error checking (some new error codes needed) and other cleanups described in the <a href="http://www.portaudio.com/docs/v19-doxydocs/todo.html">todo list</a>
+<span class="not_done">todo</span>
+
+<li>Directory structure (there is some talk of updating the project directory structure)
+<span class="not_done">todo</span>
+
+<li>Infrastructure for blocking i/o (not clear if special infrastructure is needed, or what form it should take)
+<span class="not_done">todo</span>
+
+<li>pa_cpuload uses an IIR filter to smooth CPU load measurements, but the coefficients are not varied depending on the update rate.
+<span class="not_done">todo</span>
+
+<li>Non-Interleaved buffer support - implemented in pa_process.c(see <a href="006-NonInterleavedBuffers.html">proposal 006</a>)
+<span class="done">done</span>
+
+<li>Multiple Host APIs in a Single PortAudio Build - implemented in pa_front.c (see <a href="007-MultipleHostAPIsInASingleBuild.html">proposal 007</a>)
+<span class="done">done</span>
+
+<li>Reflect new stream state machine behavior - mostly implemented by common infrastructure, requires implementations to implement IsStopped() and IsActive() see below. (see <a href="010-ClarifyStreamStateMachine.html">proposal 010</a>)
+<span class="done">done</span>
+
+<li>rename various API functions and fields for consistency (see <a href="011-RenameExistingSymbolsForConsistency.html">proposal 011</a>)
+<span class="done">done</span>
+
+<li>clean up any open streams when Pa_Terminate() is called (see <a href="012 - Additional Pa_Terminate() Behavior">proposal 012</a>)
+<span class="done">done</span>
+
+<li>require calls to Pa_Initialize()/Pa_Terminate() to be correctly paired (see <a href="012 - Additional Pa_Terminate() Behavior">proposal 012</a>)
+<span class="done">done</span>
+
+<li>refactor implementation infrastructure including common code for sample format conversion (pa_converters.c), callback buffer size and interleave adaption  (pa_process.c), cpu load measurement (pa_cpuload.c) (see <a href="013-RefactorImplementationInfrastructure.html">proposal 013</a>)
+<span class="done">done</span>
+
+<li>Use Structs for Pa_OpenStream() Parameters (see <a href="016-UseStructsForOpenStreamParameters.html">proposal 016</a>) <span class="done">done</span>
+
+<li>Provide version information via Pa_GetVersion() and Pa_GetVersionText() (see <a href="018-VersionInformationInterface.html">proposal 018</a>) <span class="done">done</span>
+
+</ul>
+
+<H3>Host API Implementations</H3>
+
+<p>
+The list below describe API features which must be implemented by each implementation. In most cases the implementation status of these features will only effect clients who make use of these features, they do not effect the funtioning of other aspects of the API.
+</p>
+
+<p>
+All features marked <span class="done">green</span> are thought to be implemented correctly, however this does not preclude bugs. Some features marked <span class="not_done">red</span> may be partially implemented or include placeholder hacks which may make them appear to work in some situations. The status of features marked <span class="unknown">yellow</span> is not presently known - developers who wrote or understand the code are requested to clarify and report the status of the entries marked yellow.
+</p>
+
+<p>Key: wmme - Windows Multimedia API (MME), ds - Windows DirectSound, asio - Steinberg ASIO (Mac and PC, Mac not tested under V19 as of September 17 2003), alsa - Advanced Linux Sound Architecture, oss - Open Sound System (Unix), mac_sm - Macintosh Sound Manager (Carbon, pre-OS X), mac_core - Mac OS X Core Audio, sgi - Silicon Graphics AL. 
+</p>
+
+<ul>
+
+<li>Consistent handling of underflow and overflow conditions (see <a href="001-UnderflowOverflowHandling.html">proposal 001</a>). This includes passing information about dropped buffers to the buffer adaptor and correctly handling the paNeverDropInput OpenStream() flag.
+<br>
+<span class="not_done">implementations blocked waiting for common infrastructure support</span>
+
+
+<li>basic PaDeviceInfo support (structVersion, name, hostApi) (see <a href="002-ImproveDeviceFormatsQueryInterface.html">proposal 002</a>)<br>
+<span class="done">wmme</span>
+<span class="done">ds</span>
+<span class="done">asio</span>
+<span class="done">alsa</span>
+<span class="done">jack</span>
+<span class="done">oss</span>
+<span class="not_done">mac_sm</span>
+<span class="not_done">mac_core</span>
+<span class="not_done">sgi</span>
+
+<li>maxInputChannels and maxOutputChannels fields of PaDeviceInfo (see <a href="002-ImproveDeviceFormatsQueryInterface.html">proposal 002</a>)<br>
+<span class="done">wmme</span>
+<span class="done">ds</span>
+<span class="done">asio</span>
+<span class="done">alsa</span>
+<span class="done">jack</span>
+<span class="not_done">oss</span>
+<span class="not_done">mac_sm</span>
+<span class="not_done">mac_core</span>
+<span class="not_done">sgi</span>
+
+<li>defaultSampleRate field of PaDeviceInfo (see <a href="002-ImproveDeviceFormatsQueryInterface.html">proposal 002</a>)<br>
+<span class="done">wmme</span>
+<span class="not_done">ds</span>
+<span class="done">asio</span>
+<span class="not_done">alsa</span>
+<span class="done">jack</span>
+<span class="done">oss</span>
+<span class="not_done">mac_sm</span>
+<span class="not_done">mac_core</span>
+<span class="not_done">sgi</span>
+
+<li>Pa_IsFormatSupported() (see <a href="002-ImproveDeviceFormatsQueryInterface.html">proposal 002</a>)<br>
+<span class="not_done">wmme</span>
+<span class="not_done">ds</span>
+<span class="not_done">asio</span>
+<span class="not_done">alsa</span>
+<span class="not_done">jack</span>
+<span class="done">oss</span>
+<span class="not_done">mac_sm</span>
+<span class="not_done">mac_core</span>
+<span class="not_done">sgi</span>
+
+<li>Calculate buffer settings based on suggestedLatency in inputParameters and outputParameters to Pa_OpenStream() (see <a href="003-ImproveLatencySpecificationInterface.html">proposal 003</a>)<br>
+<span class="done">wmme</span>
+<span class="done">ds</span>
+<span class="done">asio</span>
+<span class="done">alsa</span>
+<span class="unknown">jack</span>
+<span class="unknown">oss</span>
+<span class="not_done">mac_sm</span>
+<span class="not_done">mac_core</span>
+<span class="not_done">sgi</span>
+
+<li>defaultLowInputLatency, defaultLowOutputLatency fields of PaDeviceInfo (see <a href="003-ImproveLatencySpecificationInterface.html">proposal 003</a>)<br>
+<span class="not_done">wmme</span>
+<span class="not_done">ds</span>
+<span class="not_done">asio</span>
+<span class="done">alsa</span>
+<span class="not_done">jack</span>
+<span class="unknown">oss</span>
+<span class="not_done">mac_sm</span>
+<span class="not_done">mac_core</span>
+<span class="not_done">sgi</span>
+
+<li>defaultHighInputLatency, defaultHighOutputLatency fields of PaDeviceInfo (see <a href="003-ImproveLatencySpecificationInterface.html">proposal 003</a>)<br>
+<span class="not_done">wmme</span>
+<span class="not_done">ds</span>
+<span class="not_done">asio</span>
+<span class="done">alsa</span>
+<span class="not_done">jack</span>
+<span class="unknown">oss</span>
+<span class="not_done">mac_sm</span>
+<span class="not_done">mac_core</span>
+<span class="not_done">sgi</span>
+
+<li>inputLatency and outputLatency fields of PaStreamInfo (see <a href="003-ImproveLatencySpecificationInterface.html">proposal 003</a>)<br>
+<span class="done">wmme</span>
+<span class="not_done">ds</span>
+<span class="done">asio</span>
+<span class="not_done">alsa</span>
+<span class="not_done">jack</span>
+<span class="not_done">oss</span>
+<span class="not_done">mac_sm</span>
+<span class="not_done">mac_core</span>
+<span class="not_done">sgi</span>
+
+<li>framesPerBuffer value of paFramesPerBufferUnspecified (0) for OpenStream() to indicate variable implementation specified frames per buffer (see <a href="004-CallbackVariableFramesPerBuffer.html">proposal 004</a>)<br>
+<span class="done">wmme</span>
+<span class="done">ds</span>
+<span class="done">asio</span>
+<span class="done">alsa</span>
+<span class="done">jack</span>
+<span class="not_done">oss</span>
+<span class="not_done">mac_sm</span>
+<span class="not_done">mac_core</span>
+<span class="not_done">sgi</span>
+
+<li>Pa_ReadStream() (see <a href="005-BlockingReadWriteInterface.html">proposal 005</a>)<br>
+<span class="not_done">wmme</span>
+<span class="not_done">ds</span>
+<span class="not_done">asio</span>
+<span class="done">alsa</span>
+<span class="not_done">jack</span>
+<span class="not_done">oss</span>
+<span class="not_done">mac_sm</span>
+<span class="not_done">mac_core</span>
+<span class="not_done">sgi</span>
+
+<li>Pa_WriteStream() (see <a href="005-BlockingReadWriteInterface.html">proposal 005</a>)<br>
+<span class="not_done">wmme</span>
+<span class="not_done">ds</span>
+<span class="not_done">asio</span>
+<span class="done">alsa</span>
+<span class="not_done">jack</span>
+<span class="not_done">oss</span>
+<span class="not_done">mac_sm</span>
+<span class="not_done">mac_core</span>
+<span class="not_done">sgi</span>
+
+<li>Pa_GetStreamReadAvailable() (see <a href="005-BlockingReadWriteInterface.html">proposal 005</a>)<br>
+<span class="not_done">wmme</span>
+<span class="not_done">ds</span>
+<span class="not_done">asio</span>
+<span class="done">alsa</span>
+<span class="not_done">jack</span>
+<span class="not_done">oss</span>
+<span class="not_done">mac_sm</span>
+<span class="not_done">mac_core</span>
+<span class="not_done">sgi</span>
+
+<li>Pa_GetStreamWriteAvaliable() (see <a href="005-BlockingReadWriteInterface.html">proposal 005</a>)<br>
+<span class="not_done">wmme</span>
+<span class="not_done">ds</span>
+<span class="not_done">asio</span>
+<span class="done">alsa</span>
+<span class="not_done">jack</span>
+<span class="not_done">oss</span>
+<span class="not_done">mac_sm</span>
+<span class="not_done">mac_core</span>
+<span class="not_done">sgi</span>
+
+<li>basic PaHostApiInfo support (structVersion, type, name) (see <a href="007-MultipleHostAPIsInASingleBuild.html">proposal 007</a>)<br>
+<span class="done">wmme</span>
+<span class="done">ds</span>
+<span class="done">asio</span>
+<span class="done">alsa</span>
+<span class="done">jack</span>
+<span class="done">oss</span>
+<span class="not_done">mac_sm</span>
+<span class="not_done">mac_core</span>
+<span class="not_done">sgi</span>
+
+<li>deviceCount, defaultInputDevice, defaultOutputDevice fields of PaHostApiInfo (see <a href="007-MultipleHostAPIsInASingleBuild.html">proposal 007</a>)<br><br>
+<span class="done">wmme</span>
+<span class="done">ds</span>
+<span class="done">asio</span>
+<span class="done">alsa</span>
+<span class="done">jack</span>
+<span class="done">oss</span>
+<span class="not_done">mac_sm</span>
+<span class="not_done">mac_core</span>
+<span class="not_done">sgi</span>
+
+<li>Host API Specific Pa_OpenStream() Parameters (see <a href="008-HostAPISpecificOpenStreamParameters.html">proposal 008</a>) -
+platform specific extension, not required<br>
+<span class="done">wmme</span>
+
+<li>All predictable host API errors cleanly recovered from and mapped to PortAudio error codes (see <a href="009-HandlingHostAPISpecificErrorCodes.html">proposal 009</a>)<br>
+<span class="unknown">wmme</span>
+<span class="unknown">ds</span>
+<span class="unknown">asio</span>
+<span class="unknown">alsa</span>
+<span class="unknown">jack</span>
+<span class="unknown">oss</span>
+<span class="not_done">mac_sm</span>
+<span class="not_done">mac_core</span>
+<span class="not_done">sgi</span>
+
+<li>All unexpected host API errors mapped to paUnanticipatedHostError using PaUtil_SetLastHostErrorInfo() (see <a href="009-HandlingHostAPISpecificErrorCodes.html">proposal 009</a>)<br>
+<span class="unknown">wmme</span>
+<span class="unknown">ds</span>
+<span class="unknown">asio</span>
+<span class="unknown">alsa</span>
+<span class="unknown">jack</span>
+<span class="unknown">oss</span>
+<span class="not_done">mac_sm</span>
+<span class="not_done">mac_core</span>
+<span class="not_done">sgi</span>
+
+<li>implement IsStopped() correctly (see <a href="010-ClarifyStreamStateMachine.html">proposal 010</a> and pa_stream.h)<br>
+<span class="done">wmme</span>
+<span class="done">ds</span>
+<span class="done">asio</span>
+<span class="done">alsa</span>
+<span class="unknown">jack</span>
+<span class="unknown">oss</span>
+<span class="not_done">mac_sm</span>
+<span class="not_done">mac_core</span>
+<span class="not_done">sgi</span>
+
+<li>implement IsActive() correctly (see <a href="010-ClarifyStreamStateMachine.html">proposal 010</a> and pa_stream.h)<br>
+<span class="done">wmme</span>
+<span class="done">ds</span>
+<span class="done">asio</span>
+<span class="done">alsa</span>
+<span class="unknown">jack</span>
+<span class="unknown">oss</span>
+<span class="not_done">mac_sm</span>
+<span class="not_done">mac_core</span>
+<span class="not_done">sgi</span>
+
+<li>correctly handle paContinue result from callback (see <a href="010-ClarifyStreamStateMachine.html">proposal 010</a>)<br>
+<span class="done">wmme</span>
+<span class="done">ds</span>
+<span class="done">asio</span>
+<span class="unknown">alsa</span>
+<span class="unknown">jack</span>
+<span class="unknown">oss</span>
+<span class="not_done">mac_sm</span>
+<span class="not_done">mac_core</span>
+<span class="not_done">sgi</span>
+
+<li>correctly handle paComplete result from callback (play out all enqueued buffers) (see <a href="010-ClarifyStreamStateMachine.html">proposal 010</a>)<br>
+<span class="done">wmme</span>
+<span class="not_done">ds</span>
+<span class="done">asio</span>
+<span class="unknown">alsa</span>
+<span class="unknown">jack</span>
+<span class="unknown">oss</span>
+<span class="not_done">mac_sm</span>
+<span class="not_done">mac_core</span>
+<span class="not_done">sgi</span>
+
+<li>correctly handle paAbort result from callback (abort enqued buffers if possible) (see <a href="010-ClarifyStreamStateMachine.html">proposal 010</a>)<br>
+<span class="done">wmme</span>
+<span class="unknown">ds</span>
+<span class="done">asio</span>
+<span class="unknown">alsa</span>
+<span class="unknown">jack</span>
+<span class="unknown">oss</span>
+<span class="not_done">mac_sm</span>
+<span class="not_done">mac_core</span>
+<span class="not_done">sgi</span>
+
+<li>correctly implement Pa_StopStrem() to play out all enqueued buffers<br>
+<span class="done">wmme</span>
+<span class="unknown">ds</span>
+<span class="done">asio</span>
+<span class="unknown">alsa</span>
+<span class="unknown">jack</span>
+<span class="unknown">oss</span>
+<span class="not_done">mac_sm</span>
+<span class="not_done">mac_core</span>
+<span class="not_done">sgi</span>
+
+<li>implement Pa_AbortStream() to abort enqueued buffers where possible, and stop as quickly as possible<br>
+<span class="done">wmme</span>
+<span class="done">ds</span>
+<span class="done">asio</span>
+<span class="unknown">alsa</span>
+<span class="unknown">jack</span>
+<span class="unknown">oss</span>
+<span class="not_done">mac_sm</span>
+<span class="not_done">mac_core</span>
+<span class="not_done">sgi</span>
+
+<li>implement Pa_GetStreamTime() (see <a href="015-ImproveCallbackTimestampInfo.html">proposal 015</a>) **NOTE change proposal says stream time increases while stream is open, not just while running, not sure if alsa implementation observes this.<br> 
+<span class="done">wmme</span>
+<span class="done">ds</span>
+<span class="done">asio</span>
+<span class="done">alsa</span>
+<span class="unknown">jack</span>
+<span class="unknown">oss</span>
+<span class="not_done">mac_sm</span>
+<span class="not_done">mac_core</span>
+<span class="not_done">sgi</span>
+
+<li>pass correctly filled timeInfo field to the buffer adaptor (pa_process) (see <a href="015-ImproveCallbackTimestampInfo.html">proposal 015</a>)<br>
+<span class="done">wmme</span>
+<span class="done">ds</span>
+<span class="done">asio</span>
+<span class="done">alsa</span>
+<span class="unknown">jack</span>
+<span class="unknown">oss</span>
+<span class="not_done">mac_sm</span>
+<span class="not_done">mac_core</span>
+<span class="not_done">sgi</span>
+
+<li>place actual sample rate in the sampleRate field of PaStreamInfo (see <a href="017-MethodForRetrievingActualStreamSampleRate.html">proposal 017</a>)<br>
+<span class="not_done">not clear whether this field should be updated as the stream runs, or whether this should be the sample rate reported by the host API, and we need another field for detected/estimated sample rate.</span><br>
+<span class="done">wmme</span>
+<span class="done">ds</span>
+<span class="done">asio</span>
+<span class="unknown">alsa</span>
+<span class="not_done">jack</span>
+<span class="unknown">oss</span>
+<span class="not_done">mac_sm</span>
+<span class="not_done">mac_core</span>
+<span class="not_done">sgi</span>
+
+<li>call the stream finished callback (stream->streamRepresentation.streamFinishedCallback) at the appropriate times (see <a href="019-NotifyClientWhenAllBuffersHavePlayed.html">proposal 019</a>)<br>
+<span class="done">wmme</span>
+<span class="done">ds</span>
+<span class="done">asio</span>
+<span class="not_done">alsa</span>
+<span class="not_done">jack</span>
+<span class="done">oss</span>
+<span class="not_done">mac_sm</span>
+<span class="not_done">mac_core</span>
+<span class="not_done">sgi</span>
+
+<li>Prime buffers during Pa_StartStream if the paPrimeOutputBuffersUsingStreamCallback flag is set, zero them if it isn't set (see <a href="020-AllowCallbackToPrimeStream.html">proposal 020</a>)<br>
+<span class="done">wmme</span>
+<span class="not_done">ds</span>
+<span class="not_done">asio</span>
+<span class="not_done">alsa</span>
+<span class="not_done">jack</span>
+<span class="not_done">oss</span>
+<span class="not_done">mac_sm</span>
+<span class="not_done">mac_core</span>
+<span class="not_done">sgi</span>
+
+<li>Pass paPrimingOutput to stream callback when priming the buffers in response to paPrimeOutputBuffersUsingStreamCallback (see <a href="020-AllowCallbackToPrimeStream.html">proposal 020</a>)<br>
+<span class="done">wmme</span>
+<span class="not_done">ds</span>
+<span class="not_done">asio</span>
+<span class="not_done">alsa</span>
+<span class="not_done">jack</span>
+<span class="not_done">oss</span>
+<span class="not_done">mac_sm</span>
+<span class="not_done">mac_core</span>
+<span class="not_done">sgi</span>
+
+<li>Pass paInputUnderflow to stream callback when priming a full duplex stream's buffers in response to paPrimeOutputBuffersUsingStreamCallback (see <a href="020-AllowCallbackToPrimeStream.html">proposal 020</a>)<br>
+<span class="done">wmme</span>
+<span class="not_done">ds</span>
+<span class="not_done">asio</span>
+<span class="not_done">alsa</span>
+<span class="not_done">jack</span>
+<span class="not_done">oss</span>
+<span class="not_done">mac_sm</span>
+<span class="not_done">mac_core</span>
+<span class="not_done">sgi</span>
+
+</ul>
+
+<p>
+If there is a specific feature which has been implemented, but is not listed above, please report it so it can be added to the list.
+</p>
+
+
+
+<H2>Where to From Here?</H2>
+
+<p>
+The above status report needs to be taken in the context of the V18 release, the features it implemented (and didn't implement), and the quality and consistency of its implementations. For example many features listed above were not part of the V18 API, some were not consistently implemented accross platforms on V18, and some bug-like items were also present in V18. It remains to be decided whether every item above must be marked complete before V19 is released. One option we are considering is to release V19 as soon as it can do everything V18 could do.
+</p>
+
+<H2>How Can I Help?</H2>
+
+<p>
+There are many ways in which you can help with V19 development. To begin with, simply try using it - the more people that are using PortAudio V19, the more quickly we can find and fix problems. Read <a href="http://www.portaudio.com/docs/v19-doxydocs/">the documentation</a> and let us know if anything is confusing or unclear. Try compiling and running the tests which are known to work (see pa_tests/README.txt). Let us know about any problems you encounter. If you want to help out with development there are a number of simple tasks that you could work on, for example: write one of the missing sample converters in pa_converters.c, fix an existing test (see pa_tests/README.txt), or writing a new test. If you know something about one of the host APIs that we already support, why not review our code to see if we could be doing something better. There's also the <a href="http://www.portaudio.com/docs/v19-doxydocs/todo.html">todo list</a>. We're looking for developers to port the Macintosh and SGI versions from V18 to V19 - there's a template for new implementations in pa_skeleton.c and you can look to the existing MME, DirectSound, ASIO, ALSA and JACK implementations for guidance. It's always a good idea to in check with existing developers on the <a href="http://www.portaudio.com/contacts.html">mailing list</a> before beginning any large tasks.
+</p>
+
+
+</BODY>
+</HTML>    
