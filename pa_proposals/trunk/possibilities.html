@@ -51,17 +51,20 @@ PaError Pa_SetStreamFinishedCallback( PaStream *stream, PaStreamFinishedCallback
 </PRE>
 
 
-<H4>Pa_GetVersion() Function</H4>
+<H4>Version querying functions</H4>
 
 <P>
 Some clients could benefit from being able to determine which version of
 PortAudio is in use. This could be achieved using the following version 
-querying function:
+querying functions:
 </P>
 
 <PRE>
-/* return the release number of the currently running build of PortAudio */
+/* return the release number of the currently running build of PortAudio, eg 1900 */
 int Pa_GetVersion();
+
+/* return a textual description of the current PortAudio build, eg "PortAudio V19-devel 13 October 2002" */
+const char* Pa_GetVersionText();
 </PRE>
 
 
