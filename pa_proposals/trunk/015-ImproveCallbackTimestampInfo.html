@@ -1,0 +1,50 @@
+<HTML>
+
+<HEAD>
+<TITLE>Proposed Changes to PortAudio</TITLE>
+<META content="Phil Burk, Ross Bencina" name=Author>
+<META content="Changes being discussed by the community of PortAudio deveopers." name=Description>
+<META 
+content="PortAudio, audio, tutorial, library, portable, open-source, DirectSound, sound, music, JSyn, AudioMulch, synthesis" name=KeyWords>
+</HEAD>
+
+<BODY LINK="#0000ff" VLINK="#800080">
+
+<CENTER>
+<H3>Proposed Enhancements to PortAudio API</H3>
+<H1>015 - Improve Callback Timestamp Info</H1>
+</CENTER>
+
+<P><A href="index.html">Enhancement Proposals Index</A>,
+<A href="http://www.portaudio.com/">PortAudio Home Page</A></P>
+<P>Updated: July 23, 2002 </P>
+
+<H4>Status</H4>
+
+<P>This proposal is under construction.</P>
+
+<H4>Background</H4>
+
+<P>
+The information provided by the outTime callback parameter and Pa_StreamTime() function does
+not provide sufficient information to perform some syncronisation tasks such as syncronising
+PortAudio generated audio with another timebase (such as syncronisation pulses in a timestamped
+MIDI event stream.)
+</P>
+
+<H4>Proposal</H4>
+
+<P>
+Remove Pa_StreamTime(). Provide a common time base ( Pa_GetTime() ) and pass three time parameters to the callback: current time, time at which the first sample of the input buffer was recieved, time at which the first sample of the output buffer will play, all relative to the Pa_GetTime() timebase.
+</P>
+
+
+<H4>Impact Analysis</H4>
+
+<P>
+This proposal will require clients to rewrite code that depends on the Pa_StreamTime() parameter.
+</P>
+
+
+</BODY>
+</HTML>

@@ -1,0 +1,111 @@
+<HTML>
+
+<HEAD>
+<TITLE>Proposed Changes to PortAudio</TITLE>
+<META content="Phil Burk, Ross Bencina" name=Author>
+<META content="Changes being discussed by the community of PortAudio deveopers." name=Description>
+<META 
+content="PortAudio, audio, tutorial, library, portable, open-source, DirectSound, sound, music, JSyn, AudioMulch, synthesis" name=KeyWords>
+</HEAD>
+
+<BODY LINK="#0000ff" VLINK="#800080">
+
+<CENTER>
+<H3>Proposed Enhancements to PortAudio API</H3>
+<H1>006 - Non-Interleaved Buffers</H1>
+</CENTER>
+
+<P><A href="index.html">Enhancement Proposals Index</A>,
+<A href="http://www.portaudio.com/">PortAudio Home Page</A></P>
+<P>Updated: July 23, 2002 </P>
+
+<H4>Status</H4>
+
+<P>
+This proposal is sufficiently well defined to be implemented. It has been implemented in the v19-devel common infrastructure, implementations do not need to do anthing special to support this proposal.
+</P>
+
+<H4>Background</H4>
+
+<P>
+<A HREF="http://techweb.rfa.org/pipermail/portaudio/2001-October/000210.html">http://techweb.rfa.org/pipermail/portaudio/2001-October/000210.html</A>
+</P>
+
+<P>
+Some native APIs use non-interleaved buffers, particularly those that support more than 2 channels. Additionally, many client applications use non-interleaved buffers internally. In order to avoid adding unnecessary overhead, PortAudio should support both interleaved and non-interleaved buffers on all platforms. 
+</P>
+
+<P>
+The current (V18) PortAudio/ASIO implementation works as follows : ASIO native buffers are non-interleaved and the de-interleaving, format conversion and copying the data into PortAudio interleaved buffers is done in one loop. But if PortAudio supported non-interleaved buffers then we could use efficient vector operations even for native buffer &lt;==&gt; port audio buffers transfers. 
+</P>
+
+<H4>Proposal</H4>
+
+<P>A new sample format could be defined: </P>
+
+<PRE>
+#define paNonInterleaved ((PaSampleFormat) (1&lt;&lt;31))
+</PRE>
+
+<P>
+This could be used as a modifier flag to the buffer format fields of Pa_OpenStream(). When present, this flag would indicate that non-interleaved buffers would be passed to the callback. When not present, interleaved buffers would be used as is currently always the case. For example, the following code would open an interleaved stream:
+</P>
+
+<PRE>
+Pa_OpenStream(&amp;stream,
+    paNoDevice,
+    0,
+    paFloat32
+    NULL,
+    Pa_GetDefaultOutputDevice(),
+    2,
+    paFloat32,
+    NULL,
+    SAMPLE_RATE,
+    FRAMES_PER_BUFFER,
+    0,
+    paClipOff,
+    patestCallback,
+    &amp;data );
+</PRE>
+
+<P>And the following code would open a non-interleaved stream:</P>
+
+<PRE>
+Pa_OpenStream(&amp;stream,
+    paNoDevice,
+    0,
+    paFloat32|paNonInterleaved,
+    NULL,
+    Pa_GetDefaultOutputDevice(),
+    2,
+    paFloat32|paNonInterleaved,
+    NULL,
+    SAMPLE_RATE,
+    FRAMES_PER_BUFFER,
+    0,
+    paClipOff,
+    patestCallback,
+    &amp;data );
+</PRE>
+
+<P>
+In the user callback, the application would be passed a pointer to an array of buffers. The left and right buffers of a non-interleaved stream could be accessed as follows:
+</P>
+<PRE>
+    float *left = ((float **) inputBuffer)[0];
+    float *right = ((float **) inputBuffer)[1];
+</PRE>
+<P>
+This new sample format could also be used to interrogate the host API to see if it supports interleaved or non-interleaved buffers. This would be achieved by reading the nativeSampleFormats field of the PaDeviceInfo structure.
+</P>
+
+<H4>Impact Analysis</H4>
+
+<P>
+This proposal extends the functionality of PortAudio without any impact on existing client code. It will require new conversion functions and all existing PortAudio implementations will have to be modified to reference these new conversion functions.
+</P>
+
+
+</BODY>
+</HTML>

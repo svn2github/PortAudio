@@ -1,0 +1,368 @@
+<HTML>
+
+<HEAD>
+<TITLE>Proposed Changes to PortAudio</TITLE>
+<META content="Phil Burk, Ross Bencina" name=Author>
+<META content="Changes being discussed by the community of PortAudio deveopers." name=Description>
+<META 
+content="PortAudio, audio, tutorial, library, portable, open-source, DirectSound, sound, music, JSyn, AudioMulch, synthesis" name=KeyWords>
+</HEAD>
+
+<BODY LINK="#0000ff" VLINK="#800080">
+
+<CENTER>
+<H3>Proposed Enhancements to PortAudio API</H3>
+<H1>007 - Support for Multiple Host APIs in a Single PortAudio Build</H1>
+</CENTER>
+
+<P><A href="index.html">Enhancement Proposals Index</A>,
+<A href="http://www.portaudio.com/">PortAudio Home Page</A></P>
+<P>Updated: July 26, 2002 </P>
+
+<H4>Status</H4>
+
+<P>
+This proposal is essentially complete and has been implemented in v19-devel. Due to its dependence on a number of other unfinished proposals there is a small probability that this proposal may undergo further changes.
+</P>
+
+<H4>Dependencies </H4>
+
+<P>
+The API changes described in this proposal are independent of all other proposals. However, changes to the host error mechanism defined in 
+<A HREF="009-HandlingHostAPISpecificErrorCodes.html">009 - Handling of Host API Specific Error Codes</A>, 
+and the addition of new API functions due to the 
+<A HREF="005-BlockingReadWriteInterface.html">005 - Blocking Read/Write Interface</A>
+proposal may effect the implementation of this proposal. 
+Changes to the API defined by the 
+<A HREF="002-ImproveDeviceFormatsQueryInterface.html">002 - Improve Device Formats Query Interface</A> 
+and the 
+<A HREF="003-ImproveLatencySpecificationInterface.html">003 - Improve Latency Specification Interface</A>
+proposals will need to be multi-host-API capable. 
+</P>
+
+<H4>Background</H4>
+<P>
+At present (V18) PortAudio allows clients to link in support for only one host API, supporting multiple host APIs requires separate executables for each host API to be built.
+As the number of supported host APIs on each platform grows (we now support 3 host APIs under Windows for example) client applications need to be able to select between different host APIs at run-time. At least four platforms supported by PortAudio have more than one host audio API. 
+</P>
+
+<P>
+This proposal is based this email: <A HREF="http://techweb.rfa.org/pipermail/portaudio/2001-December/000308.html">http://techweb.rfa.org/pipermail/portaudio/2001-December/000308.html</A>
+</P>
+
+<H4>Requirements</H4>
+
+<P>
+It will be necessary to supply clients with a method of displaying a textual description of the host API for each PortAudio device.</P>
+
+<P>
+Some PortAudio functions do not operate on PortAudioStreams, but rather they operate on or return the global state of the PortAudio library as a whole. If multiple host APIs were present, some of these functions would have different implementations, or would return different values depending on which host API they applied to. These functions include:
+</P>
+
+<PRE>    
+int Pa_GetMinNumBuffers( int framesPerBuffer, double sampleRate );
+PaDeviceID Pa_GetDefaultInputDeviceID( void );
+PaDeviceID Pa_GetDefaultOutputDeviceID( void );
+</PRE>
+
+<P>
+Note that Pa_CountDevices() could also be interpreted as applying to a specific host API.
+</P>
+
+<P>
+PortAudio currently defines a per-host-API extension mechanism via the inputDriverInfo and outputDriverInfo parameters to Pa_OpenStream(). For code to take advantage of host-API-specific extensions when multiple host APIs are present there needs to be a way to establish which (statically identified) host API is associated with each device. This is because host-API -specific extensions must only be used in combination with devices supplied by that host API.
+</P>
+
+<P>
+PortAudio should present clients with all of the devices made available by each host API. This means that some physical devices may be accessible though multiple host APIs. Since it will not be possible to open a full duplex stream with input and output devices from different host APIs, some clients may want to enumerate the available host APIs and only display devices from one host API at a time.</P>
+
+<P>
+Introducing a new PortAudioHostAPI abstraction could fulfil the above requirements. At a minimum, this abstraction would need to have the following attributes:
+</P>
+
+<UL>
+<LI>A textual description for display on user interfaces </LI>
+<LI>Functions for querying default device ids and latency parameters for each host API</LI>
+<LI>A unique identifier for each host API published in portaudio.h for use in code which takes advantage of host API specific extensions</LI>
+</UL>
+
+<P>Additionally, the following features could be present:</P>
+
+<UL>
+<LI>A method for querying the default PortAudioHostAPI (perhaps the "best" host API which has more than 0 devices available) </LI>
+<LI>A method for enumerating 'currently available' PortAudioHostAPIs. 'Currently available' could be interpreted as meaning the host APIs linked into the current PortAudio implementation, or it could mean the host APIs which currently have more than zero devices available. </LI>
+<LI>A method of enumerating PortAudioDevices independently for each available PortAudioHostAPI</LI>
+</UL>
+
+<H4>Proposal</H4>
+
+<P>
+This proposal consists of the 7 modifications to the PortAudio API listed below.
+</P>
+
+<P>1. Define a new PaHostApiTypeId enumeration, with fixed values for each host API:</P>
+<PRE>
+/*
+    The PaHostApiTypeId enumeration contains unchanging unique identifiers 
+	for each supported host API. This type is used in the PaHostApiInfo 
+	structure. The values are guaranteed to be unique and to never change, 
+    thus allowing code to be written that conditionally uses host API specific 
+    extensions.
+     
+    New type ids will be allocated when support for a host API reaches
+    "public alpha" status, prior to that developers should use the
+    paInDevelopment type id.
+*/
+
+typedef enum {
+    paInDevelopment=0, /* use while developing support for a new host API */
+    paWin32DirectSound=1,
+    paWin32MME=2,
+    paWin32ASIO=3,
+    paMacOSSoundManager=4,
+    paMacOSCoreAudio=5,
+    paMacOSASIO=6,
+    paOSS=7,
+    paALSA=8,
+    paIRIXAL=9,
+    paBeOS=10
+}PaHostApiTypeId;
+</PRE>
+
+
+<P>2. Define a method for enumerating host APIs:</P>
+<PRE>
+/* Host API enumeration mechanism */
+
+
+typedef int PaHostApiIndex;
+/**< The type used to enumerate to host APIs at runtime. Values of this type
+ range from 0 to (Pa_CountHostApis()-1).
+     
+ @see Pa_CountHostApis
+*/
+
+
+PaHostApiIndex Pa_CountHostApis( void );
+/**< Retrieve the number of available host APIs. Even if a host API is
+ available it may have no devices available.
+ 
+ @return The number of available host APIs. May return 0 if PortAudio is
+ not initialized or an error has occured.
+     
+ @see PaHostApiIndex
+*/
+
+
+PaHostApiIndex Pa_GetDefaultHostApi( void );
+/**< Retrieve the index of the defualt hostAPI. The default host API will be
+ the lowest common denominator host API on the current platform and is
+ unlikely to provide the best performance.
+     
+ @return The default host API index.
+*/
+</PRE>
+
+
+<P>3. Provide a method for retrieving information about a given host API:</P>
+<PRE>
+typedef struct
+{
+    int structVersion;
+    PaHostApiTypeId type; /**< the well known unique identifier of this host API @see PaHostApiTypeId*/
+    const char *name; /* a textual description of the host API for display on user interfaces */
+}
+PaHostApiInfo;
+/**< A structure containing information about a particular host API. */
+
+
+const PaHostApiInfo * Pa_GetHostApiInfo( PaHostApiIndex hostApi );
+/**< Retrieve a pointer to a structure containing information about a specific
+ host Api.
+     
+ @param hostApi A valid host API index ranging from 0 to (Pa_CountHostApis()-1)
+     
+ @return A pointer to an immutable PaHostApiInfo structure describing
+ a specific host API. If the hostApi parameter is out of range or an error
+ is encountered, the function returns NULL.
+     
+ The returned structure is owned by the PortAudio implementation and must not
+ be manipulated or freed. The pointer is only guaranteed to be valid between
+ calls to Pa_Initialize() and Pa_Terminate().
+*/
+</PRE>
+
+<P>4. Add a new field to PaDeviceInfo to identify the host API type:</P>
+<PRE>
+struct{
+    ...
+    PaHostApiIndex hostApi; /* note this is a host API index, not a type id*/
+    ...
+}PaDeviceInfo;
+</PRE>
+
+<P>This would enable the following two code fragments to be written.</P>
+<PRE>
+/* obtain the user-readable name of a device's host API */
+Pa_GetHostApiInfo( deviceInfo-&gt;hostApi )-&gt;name;
+
+/* implement special behavior for a specific host API */
+if( Pa_GetHostApiInfo( deviceInfo-&gt;hostApi )-&gt;typeId == paWin32MME ){
+    InitialiseWmmeSpecificDeviceInfo();
+}
+</PRE>
+
+<P>5. Provide methods for finding per-host API default devices:</P>
+<PRE>
+PaDeviceIndex Pa_HostApiDefaultInputDevice( PaHostApiIndex hostApi );
+/**< Retrieve the default input device for the specified host API
+     
+ @param hostApi A valid host API index ranging from 0 to (Pa_CountHostApis()-1)
+     
+ @return A device index ranging from 0 to (Pa_CountDevices()-1), or paNoDevice
+ if there is no default input device available for the specified host API.
+*/
+
+
+PaDeviceIndex Pa_HostApiDefaultOutputDevice( PaHostApiIndex hostApi );
+/**< Retrieve the default output device for the specified host API
+
+ @param hostApi A valid host API index ranging from 0 to (Pa_CountHostApis()-1)
+
+ @return A device index ranging from 0 to (Pa_CountDevices()-1), or paNoDevice
+ if there is no default output device available for the specified host API.
+*/
+</PRE>
+
+<P>6. Provide functions for enumerating devices on a per-host-API basis. Note that this functionality is provided in addition to the current Pa_CountDevices() and Pa_GetDeviceInfo() functions:</P>
+<PRE>
+int Pa_HostApiCountDevices( PaHostApiIndex hostApi );
+/**< Retrieve the number of devices belonging to a specific host API.
+ This function may be used in conjunction with Pa_HostApiDeviceIndexToDeviceIndex()
+ to enumerate all devices for a specific host API.
+ 
+ @param hostApi A valid host API index ranging from 0 to (Pa_CountHostApis()-1)
+     
+ @return The number of devices belonging to the specified host API.
+     
+ @see Pa_HostApiDeviceIndexToDeviceIndex
+*/
+
+
+PaDeviceIndex Pa_HostApiDeviceIndexToDeviceIndex( PaHostApiIndex hostApi,
+        int hostApiDeviceIndex );
+/**< Convert a host-API-specific device index to standard PortAudio device index.
+ This function may be used in conjunction with Pa_HostApiCountDevices() to
+ enumerate all devices for a specific host API.
+
+ @param hostApi A valid host API index ranging from 0 to (Pa_CountHostApis()-1)
+
+ @param hostApiDeviceIndex A valid per-host device index in the range
+ 0 to (Pa_HostApiCountDevices(hostApi)-1)
+
+ @see Pa_HostApiCountDevices
+*/
+</PRE>
+
+<P>7. Re-implement the following existing functions to use the default host API. This would be a backwards compatible change.</P>
+<PRE>
+PaDeviceIndex Pa_GetDefaultInputDevice( void ); /* returns the default device id for the default host API */
+PaDeviceIndex Pa_GetDefaultOutputDevice( void );
+</PRE>
+
+<H4>Discussion</H4>
+
+<P>
+The main disadvantage of this proposal it that it may make the API seem more complex for new users.
+</P>
+
+<P>
+There is concern that this proposal is too complex, and that the simpler solution of simply adding a hostAPI string to the device info structure of each device would be sufficient. It is true that the simple solution would allow clients to duplicate the functionality of this proposal, provided hostAPI strings were published and guaranteed not to change in the future. However, the bulk of the functionality included in this proposal will need to be implemented internally to facilitate multiple host API support anyway. This proposal is based on the assumption that it is better to expose such functionality in the PortAudio API rather than require clients to reimplement what is already present internally.
+</P>
+
+<P>
+There has been discussion about supporting "pluggable" host APIs - the general idea is that a client application could link against PortAudio and PortAudio would load the available Host APIs at run-time using "PortAudio Host API Plugins." Some people consider this to be an overly complex solution, and no significant advantages over a monolithic PortAudio dll have been submitted yet. Some people would like PortAudio to always be able to be statically linked with multiple host API support. The ability to load additional host APIs at runtime is considered desirable so long as the basic multiple host API mechanism does not require dynamic linking.
+</P>
+
+<P>
+The overhead (both processor and memory) of the Multiple Host API support should be minimised on platforms which don't have multiple host APIs (such as BeOS and some handheld devices.) However, the multiple host API support will still be used on all platoforms, so as to reduce the burden on implementers if a second API becomes available, and also to allow reuse of common code in the multiple host API layer across all implementations.
+</P>
+
+<H4>Implementation Notes</H4>
+
+<P>
+The implementation will follow the methodology currently employed in PortMIDI described here: <A HREF="http://techweb.rfa.org/pipermail/portaudio/2001-December/000295.html">http://techweb.rfa.org/pipermail/portaudio/2001-December/000295.html</A>
+</P>
+
+<P>This proposal has been implemented in the v19-devel CVS branch.</P>
+
+<P>
+This proposal will involve the changes described below. Note that the string &lt;HA&gt; will be replaced with a host API tag for each implementation.
+</P>
+
+<P>
+Each host API will have it's own Initialize function which PortAudio will call in response to client calls to Pa_Initialize and Pa_Terminate respectively. This will be the only identifier each host API implementation will be required to expose.
+</P>
+
+<PRE>PaError Pa&lt;HA&gt;_Initialize( PaImplementation **impl );</PRE>
+
+<P>
+PaImplementation is an internal data structure containing a set of function pointers for globally relevant functions: (function pointer type declarations omitted for simplicity:)
+</P>
+
+<PRE>
+struct{
+    fptr terminate; /* takes the PaImplementation* returned by initialize */
+    fptr getHostAPIInfo;
+    fptr getHostError;
+    fptr getHostErrorText;
+    fptr countDevices;
+    fptr getDefaultInputDeviceID;
+    fptr getDefaultOutputDeviceID;
+    fptr getDeviceInfo;
+    fptr openStream;
+    fptr getMinNumBuffers;
+} PaImplementation;
+</PRE>
+
+<P>
+The function pointers in PaImplementation will point to the corresponding functions in current PortAudio implementations. The new multiple host API support code will take care of mapping per-host API device ids onto a single homogenous device id range. A significant advantage of this scheme is that it will require very little change to existing PortAudio implementations.
+</P>
+<P>
+A new PaStreamImplementation internal data structure will be defined to contain function pointers to implementations of the stream functions for each host API. This structure will be placed at the head of implementation-specific data structures returned as PortAudioStream* in current implementations.
+</P>
+
+<PRE>
+struct{
+    unsigned long magic;
+    fptr close;
+    fptr start;
+    fptr stop;
+    fptr abort;
+    fptr read;
+    fptr write;
+    fptr readAvailable;
+    fptr writeAvailable;
+    fptr active;
+    fptr time;
+    fptr cpuLoad;
+} PaStreamImplementation;
+</PRE>
+
+<P>
+Magic contains a unique bit pattern which should be set by implementations when a stream is opened, and cleared when it is closed. This technique will allow implementations to perform some degree of validation on PortAudioStream* passed to PortAudio.
+</P>
+
+<H4>Impact Analysis</H4>
+
+<P>
+This proposal will significantly improve the utility of PortAudio by allowing clients to support multiple host APIs in a single executable.
+</P>
+
+<P>
+Since multiple host APIs may return devices with the same names, a minimum requirement for clients who want to be "multiple host API aware" will be to ensure that the appropriate host API name is displayed alongside device names in the user interface.
+</P>
+
+
+</BODY>
+</HTML>

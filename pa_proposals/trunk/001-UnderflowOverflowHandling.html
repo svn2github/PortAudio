@@ -1,0 +1,95 @@
+<HTML>
+
+<HEAD>
+<TITLE>Proposed Changes to PortAudio</TITLE>
+<META content="Phil Burk, Ross Bencina" name=Author>
+<META content="Changes being discussed by the community of PortAudio deveopers." name=Description>
+<META 
+content="PortAudio, audio, tutorial, library, portable, open-source, DirectSound, sound, music, JSyn, AudioMulch, synthesis" name=KeyWords>
+</HEAD>
+
+<BODY LINK="#0000ff" VLINK="#800080">
+
+<CENTER>
+<H3>Proposed Enhancements to PortAudio API</H3>
+<H1>001 - Pass Underflow/Overflow Information to the Stream Callback</H1>
+</CENTER>
+
+<P><A href="index.html">Enhancement Proposals Index</A>,
+<A href="http://www.portaudio.com/">PortAudio Home Page</A></P>
+<P>Updated: July 23, 2002 </P>
+
+<H4>Status</H4>
+
+<P>
+This proposal is sufficiently well defined to be implemented. 
+</P>
+
+<H4>Background</H4>
+
+<P>
+There are conditions where a full-duplex stream needs to generate output but doesn't have any input available, or where it has too much input so some input needs to be discarded (not passed to the output.) There is also the case where output is needed, but the callback has (transiently) consumed so much CPU time that output has to be generated without the callback being called.
+</P>
+
+<P>Currently (V17) the Stream Callback Function handles these underflow/overflow conditions by passing NULL buffer pointers to the callback. This can happen if the output is pre-rolled and there is not yet any input data. It can also happen if the input underflows. 
+</P>
+
+<P>
+A number of concerns have been raised about the current system: For PortAudio to discard input just because it is not needed for output is considered unacceptable for some recording applications. Passing of NULL buffer pointers has been deemed to be too error prone and requires too much housekeeping for simple programs.
+</P>
+
+<P>
+See <A HREF="http://techweb.rfa.org/pipermail/portaudio/2001-October/000222.html">http://techweb.rfa.org/pipermail/portaudio/2001-October/000222.html</A> and subsequent messages in various threads.
+</P>
+
+<P>
+This proposal seeks to make implementing the Stream Callback as simple as possible for ease-of-use while providing full access to overflow/underflow information, and all input and output sample data when clients require it.
+</P>
+
+<H4>Proposal</H4>
+
+<P>
+For streams providing input, the inputBuffer parameter will always point to a valid memory location containing framesPerBuffer frames of sample data in the requested format. The inputBuffer parameter will be NULL for output only streams. Similarly, the outputBuffer parameter will be NULL for input only streams, otherwise it will point to a valid memory location containing framesPerBuffer frames of sample data.
+</P>
+
+<P>
+A new parameter will be added to the Stream Callback Function that gives the status of the data as bit flags. 
+</P>
+
+<PRE>
+typedef int (PaStreamCallback)(
+  void *inputBuffer, void *outputBuffer,
+  unsigned long framesPerBuffer,
+  PaTimestamp outTime, 
+  unsigned long statusFlags,
+  void *userData );
+</PRE>
+
+<P>The following bits may be set in the statusFlags parameter. </P>
+
+<PRE>
+#define paInputUnderflow&nbsp;&nbsp; (1&lt;&lt;0) /* Input data is all zeros because no real data is available. */ 
+#define paInputOverflow    (1&lt;&lt;1) /* Input data was discarded by PortAudio */
+#define paOutputUnderflow  (1&lt;&lt;2) /* Output data was inserted by PortAudio because the callback is using too much CPU */
+#define paOutputOverflow   (1&lt;&lt;3) /* Output data will be discarded because no room is available. */</PRE>
+
+<P>New rules will govern when the Stream Callback is called:</P>
+
+<UL>
+<LI>For input-only streams, the callback will be called for every available input buffer. If the callback takes too long to complete and input samples have to be discarded the paInputOverflow flag will be set the next time the callback is called. An input-only stream will never be called with the paInputUnderflow flag set. </LI>
+<LI>For output-only streams, the callback will be called whenever an output buffer needs to be filled, except when doing so would cause the stream to fall further behind real-time due to the CPU load being too high. In such cases PortAudio will insert silence or repeat the previous buffer to the output and the paOutputUnderflow bit will be set next time the callback is called. An output-only stream will never be called with the paOutputOverflow flag set. </LI>
+<LI>By default, a full duplex stream will behave according to the same rules as an output-only stream. If input is not available, the paInputUnderflow bit will be set and the input buffers will contain zeros. In the case of an input buffer overflow, PortAudio will discard input - in such cases the input samples will <B>not</B> be passed to a callback, and paInputOverflow will be set next time the callback is called to generate more output. A full-duplex stream in default mode will never be called with the paOutputOverflow flag set. </LI>
+<LI>A new mode flag to Pa_OpenStream(), <I>paNeverDropInput</I> specifies that a full duplex stream will not discard overflowed input samples without calling the callback. When an input buffer overflow occurs, the callback will be passed an input buffer containing valid data and a valid output buffer pointer, the paOutputOverflow flag will be set, when the callback completes the output buffer will be discarded.</LI></UL>
+
+<P>
+Note that the default full-duplex mode is intended to cover most common uses of PortAudio, where the client wants a simple audio streaming interface, and is happy to let PortAudio handle buffer underflow/overflow conditions when they occur.
+</P>
+
+<H4>Impact Analysis</H4>
+
+<P>
+This proposal involves adding a new statusFlags parameter to the PaStreamCallback. This will require all clients to update their callback declarations accordingly. Clients who previously checked for NULL buffers will be able to remove such checks. Only clients who whish to take advantage of the callback flags, or the new <I>paNeverDropInput</I> mode will require additional changes.
+</P>
+
+</BODY>
+</HTML>
