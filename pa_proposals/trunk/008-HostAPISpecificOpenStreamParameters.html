@@ -17,35 +17,33 @@ content="PortAudio, audio, tutorial, library, portable, open-source, DirectSound
 
 <P><A href="index.html">Enhancement Proposals Index</A>,
 <A href="http://www.portaudio.com/">PortAudio Home Page</A></P>
-<P>Updated: July 31, 2002 </P>
+<P>Updated: October 18, 2002 </P>
 
 
 <H4>Status</H4>
 
 <P>
-This proposal is sufficiently well defined to be implemented. It has been partially implemented
-in v19-devel, however the current proposal no longer utilises the PaHostApiSpecificStreamInfo
-structure currently used in v19-devel.
+This proposal is sufficiently well defined to be implemented. It has been implemented
+in v19-devel.
 </P>
 <H4>Dependencies</H4>
 
 <P>
 If the PaHostApiSpecificStreamInfo structure defined in this proposal includes a PaHostApiTypeId host API identifier, then this proposal depends on the 
 <A HREF="007-MultipleHostAPIsInASingleBuild.html">007 - Support for Multiple Host APIs in a Single PortAudio Build</A>
-
 proposal to define the form of the identifier.
 </P>
 
 <H4>Background</H4>
 
 <P>
-Pa_OpenStream has always had inputDriverInfo and outputDriverInfo parameters, which were defined to support passing host API specific information to PortAudio implementations. Currently these parameters are defined as void* and are not used by any implementation. Two uses of inputDriverInfo and outputDriverInfo are planned for the near future: passing device names to OSS drivers, and passing additional device ids for opening multichannel soundcards under MME.
+Pa_OpenStream has always had inputDriverInfo and outputDriverInfo parameters, which were defined to support passing host API specific information to PortAudio implementations. Currently (V18) these parameters are defined as void* and are not used by any implementation. Two uses of inputDriverInfo and outputDriverInfo are planned for the near future: passing device names to OSS drivers, and passing additional device ids for addressing multichannel soundcards under MME.
 </P>
 
 <H4>Proposal</H4>
 
 <P>
-The inputDriverInfo and outputDriverInfo to Pa_OpenStream() will be renamed inputStreamInfo and outputStreamInfo.
+The inputDriverInfo and outputDriverInfo fields to Pa_OpenStream() will be moved to the PaStreamParameters structure described in <A HREF="016-UseStructsForOpenStreamParameters.html">016 - Use Structs for Pa_OpenStream() Parameters</A>. The equivalent field in this structure will be a void* field named hostApiSpecificStreamInfo.
 </P>
 
 <P>
@@ -54,8 +52,8 @@ and outputStreamInfo parameters.
 </P
 
 <PRE>
-#define paNullStreamInfo ((void*)0)
-</P>
+#define paNullHostApiSpecificStreamInfo ((void*)0)
+</PRE>
 
 <P>
 All data structures defined by implementations to be passed
@@ -64,9 +62,9 @@ must begin with the following fields:
 </P>
 
 <PRE>
-unsigned long size;    /* size of whole structure including this header */
+unsigned long size;          /* size of whole structure including this header */
 PaHostApiTypeId hostApiType; /* host API for which this data is intended */
-unsigned long version; /* structure version */
+unsigned long version;       /* structure version */
 </PRE>
 
 <P>
@@ -83,12 +81,12 @@ The following host API specific extensions will be placed in separate header fil
 <P>The following structure is proposed for passing device names to the OSS implementation:</P>
 <PRE>
 struct{
-    unsigned long size;    /* size of whole structure including this header */
-	PaHostApiTypeId hostApiType; /* host API for which this data is intended */
-	unsigned long version; /* structure version */
+    unsigned long size;          /* size of whole structure including this header */
+    PaHostApiTypeId hostApiType; /* host API for which this data is intended */
+    unsigned long version;       /* structure version */
 
     char *deviceName;
-}PaOSSSpecificStreamInfo;
+}PaOssSpecificStreamInfo;
 </PRE>
 
 <P>
@@ -127,9 +125,9 @@ typedef struct PaWinMmeDeviceAndNumChannels{
 
 
 typedef struct PaWinMmeStreamInfo{
-    unsigned long size;    /* size of whole structure including this header */
-	PaHostApiTypeId hostApiType; /* host API for which this data is intended */
-	unsigned long version; /* structure version */
+    unsigned long size;          /* size of whole structure including this header */
+    PaHostApiTypeId hostApiType; /* host API for which this data is intended */
+    unsigned long version;       /* structure version */
 
     unsigned long flags;
 
@@ -168,9 +166,9 @@ be embedded at the head of each host-api specific stream info structure:
 </P>
 <PRE>
 struct{
-    unsigned long size;    /* size of whole structure including this header */
+    unsigned long size;          /* size of whole structure including this header */
     PaHostApiTypeId hostApiType; /* host API for which this data is intended */
-    unsigned long version; /* structure version */
+    unsigned long version;       /* structure version */
 }PaHostApiSpecificStreamInfo;
 </PRE>
 
@@ -182,9 +180,8 @@ implicit.
 
 <P>
 When PaHostApiSpecificStreamInfo was still declared, we intended to change the type of the
-streamInfor parameters from void* to PaHostApiSpecificStreamInfo*. Some objections were raised 
-to this, as it may have required clients to explicitly cast to PaHostAPISpecificInfo* when passing NULL. However the added semantic and type safety advantages were considered more valuable. The current
-proposal leaves these parameters as NULL.
+streamInfo parameters from void* to PaHostApiSpecificStreamInfo*. Some objections were raised 
+to this, as it may have required clients to explicitly cast to PaHostAPISpecificInfo* when passing NULL. However the added semantic and type safety advantages were considered more valuable. The current proposal leaves these parameters as void*.
 </P>
 
 <P>
@@ -195,7 +192,7 @@ proposal to support (multiple interleave &lt;==&gt; unified interleave) and (mul
 <H4>Impact Analysis</H4>
 
 <P>
-This proposal provides access to new platform-specific extensions. No existing client code will be modified. Only implementations that implement the extensions will be effected. Depending on the compiler used, clients passing NULL for inputStreamInfo and outputStreamInfo may need to explicitly cast to (PaHostAPISpecificInfo*).
+This proposal provides access to new platform-specific extensions. No existing client code will be modified. Only implementations that implement the extensions will be effected.
 </P>
 
 
