@@ -17,7 +17,7 @@ content="PortAudio, audio, tutorial, library, portable, open-source, DirectSound
 
 <P><A href="index.html">Enhancement Proposals Index</A>,
 <A href="http://www.portaudio.com/">PortAudio Home Page</A></P>
-<P>Updated: October 18, 2002 </P>
+<P>Updated: October 20, 2002 </P>
 
 
 <H4>Status</H4>
@@ -45,15 +45,6 @@ Pa_OpenStream has always had inputDriverInfo and outputDriverInfo parameters, wh
 <P>
 The inputDriverInfo and outputDriverInfo fields to Pa_OpenStream() will be moved to the PaStreamParameters structure described in <A HREF="016-UseStructsForOpenStreamParameters.html">016 - Use Structs for Pa_OpenStream() Parameters</A>. The equivalent field in this structure will be a void* field named hostApiSpecificStreamInfo.
 </P>
-
-<P>
-A special constant paNullStreamInfo will be defined, which can be used in the inputStreamInfo
-and outputStreamInfo parameters.
-</P
-
-<PRE>
-#define paNullHostApiSpecificStreamInfo ((void*)0)
-</PRE>
 
 <P>
 All data structures defined by implementations to be passed
@@ -177,6 +168,17 @@ However, the unidiomatic type casts required to make the use of this structure t
 lead us to the current approach, where the presence of the header structure is 
 implicit.
 </P>
+
+<P>
+Originally A special constant paNullStreamInfo was to be defined, which coud be used in the inputStreamInfo and outputStreamInfo parameters. However since the introduction of the PaStreamParameters structure there is no longer any benefit to having a constant which 
+indicates the role of the value.
+</P>
+
+<PRE>
+#define paNullHostApiSpecificStreamInfo ((void*)0)
+</PRE>
+
+
 
 <P>
 When PaHostApiSpecificStreamInfo was still declared, we intended to change the type of the
