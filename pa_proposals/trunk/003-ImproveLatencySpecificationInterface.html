@@ -17,11 +17,13 @@ content="PortAudio, audio, tutorial, library, portable, open-source, DirectSound
 
 <P><A href="index.html">Enhancement Proposals Index</A>,
 <A href="http://www.portaudio.com/">PortAudio Home Page</A></P>
-<P>Updated: July 23, 2002 </P>
+<P>Updated: July 30, 2002 </P>
 
 <H4>Status</H4>
 
-<P>This proposal is open for discussion.</P>
+<P>
+This proposal is sufficiently well defined to be implemented. The current V19 implementation is not up to date (it uses frames instead of seconds for the suggestedInputLatency and suggestedOuputLatency parameters to Pa_OpenStream, and doesn't provide the default latency or latency querying functions.)
+</P>
 
 <H4>Background</H4>
 
@@ -41,32 +43,34 @@ See this thread: <A HREF="http://techweb.rfa.org/pipermail/portaudio/2001-Octobe
 <H4>Proposal</H4>
 
 <P>
-The numBuffers parameter to Pa_OpenStream() could be removed, and replaced by two new parameters inputLatency and outputLatency, both expressed in frames. These parameters allow clients to fine-tune latency in a portable manner. Where possible PortAudio implementations should select buffer sizes based on these parameters, otherwise they may choose the closest viable buffer size and latency instead. In such cases the PortAudio implementations should round-up (ie always provide an equal or higher latency than requested.) 
+The numBuffers parameter to Pa_OpenStream() will be removed, and replaced by two new parameters suggestedInputLatency and suggestedOutputLatency, both expressed in seconds. These parameters allow clients to fine-tune latency in a portable manner. Where practical PortAudio implementations should select buffer sizes based on these parameters, otherwise they may choose the closest viable buffer size and latency instead. In such cases the PortAudio implementations should round-up (ie always provide an equal or higher latency than requested.) 
 </P>
 
 <P>
-The special latency value of 0 indicates that the implementation should use a default latency value, this will produce the same behavior as passing 0 for numBuffers in existing PortAudio implementations. Clients may retrieve recommended safe latency settings using the following two functions:
+The following functions will be supplied to retrieve default input and output latency values. Separate default latency values are provided for interactive applications where low latency is important to useful operation, and for robust applications where additional latency is acceptable if it will result in more stable performance or place a reduced load on the system.
 </P>
 
 <PRE> 
-unsigned long Pa_GetRecommendedLowInputLatency( PaDeviceIndex deviceID ); /* For interactive performance. */
-unsigned long Pa_GetRecommendedHighInputLatency( PaDeviceIndex deviceID ); /* For playing sound files. */
-unsigned long Pa_GetRecommendedLowOutputLatency( PaDeviceIndex deviceID ); /* For interactive performance. */
-unsigned long Pa_GetRecommendedHighOutputLatency( PaDeviceIndex deviceID ); /* For playing sound files. */
+typedef double PaTime; /* time expressed in seconds */
+
+PaTime Pa_GetDefaultLowInputLatency( PaDeviceIndex deviceID ); /* For interactive performance. */
+PaTime Pa_GetDefaultHighInputLatency( PaDeviceIndex deviceID ); /* For playing sound files. */
+PaTime Pa_GetDefaultLowOutputLatency( PaDeviceIndex deviceID ); /* For interactive performance. */
+PaTime Pa_GetDefaultHighOutputLatency( PaDeviceIndex deviceID ); /* For playing sound files. */
 </PRE>
 
 <P>
-Currently, when numBuffers is greater than 0, Pa_OpenStream will constrain the actual numBuffers so that the latency is within a valid range determined by the host API, or an environment variables such as PA_MIN_LATENCY_MSEC. Propose changing the behavior so that the requested value is honored as much as possible. This will allow the user to override the recommended minimum latency if they know their system can handle it. This might be used, for example on patched Linux kernels
+Currently, when numBuffers is greater than 0, Pa_OpenStream will constrain the actual numBuffers so that the latency is within a valid range determined by the host API, or an environment variables such as PA_MIN_LATENCY_MSEC. Propose changing the behavior so that the requested value is honored as much as possible. This will allow the user to override the recommended minimum latency if they know their system can handle it. This might be used, for example on patched Linux kernels.
 </P>
 
 <P>
-The following two functions have been proposed to retrieve the input and output latency of a stream. Both return the latency in seconds.
+The following two functions are proposed to retrieve the input and output latency of a stream. Both return the latency in seconds.
 </P>
 
 <PRE>
 /* the following would operate directly on streams */
-double Pa_GetStreamInputLatency( PaStream *stream );
-double Pa_GetStreamOutputLatency( PaStream *stream );
+PaTime Pa_GetStreamInputLatency( PaStream *stream );
+PaTime Pa_GetStreamOutputLatency( PaStream *stream );
 </PRE>
 
 <P>
@@ -89,19 +93,11 @@ In cases where Host API specific latency parameters may be limited to certain al
 <H4>Discussion</H4>
 
 <P>
-This proposal provides both a high level mechanism for portable latency tuning, and suggests method for providing a host-API specific latency tuning interface. The provision of both default latency settings (via 0 valued latency parameters) and query functions for recommended latency settings provide the needed flexibility for simple, and portable applications.
+This proposal provides both a high level mechanism for portable latency tuning, and suggests a method for providing a host-API specific latency tuning interface. Default latency query functions are provided to support simple portable applications.
 </P>
 
 <P>
-It is not clear whether a 0 latency parameter produces the same latency as returned by Pa_GetRecommendedHighLatencySamples() or whether there is a separate default latency value, in which case there should also be a Pa_GetDefaultLatencySamples() function.
-</P>
-
-<P>
-It is unclear whether the Pa_GetStreamInputLatency() and Pa_GetStreamOutputLatency() functions are needed, whether they relate directly to this proposal, and how they will be effected by the <U>Improve Callback Timestamp Information</U> proposal. 
-</P>
-
-<P>
-Should we provide a way of notifying the client if the latency parameters have not been accurately honored?
+Expressing suggestedLatency in frames was considered, but rejected because it makes sense to return the actual latency from Pa_GetStreamInputLatency() in seconds, and being consistent was deemed to be important for clarity and avoiding usage errors.
 </P>
 
 <H4>Impact Analysis</H4>
