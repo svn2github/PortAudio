@@ -30,7 +30,7 @@ TD.na	{}
 </CENTER>
 
 <P><A href="http://www.portaudio.com/">PortAudio Home Page</A></P>
-<P>Updated: September 23, 2003 </P>
+<P>Updated: October 8, 2003 </P>
 
 <H2>Background</H2>
 
@@ -41,7 +41,7 @@ For some years PortAudio development proceeded incrementally - bugs were fixed, 
 <P>Although each proposal is relatively small when taken in isolation, the overall scale of required changes from V18 to V19 is substantial. The new common infrastructure imposes a new interface for implementations. This new interface increases reliability and consistency and reduces development effort, but requires considerable refactoring (some would say redevelopment) of existing PortAudio implementations relative to the V18 code base. 
 </P>
 <P>
-At the time of writing, a substantial portion of V19 functionality has been implemented for Windows (MME, DirectSound, and ASIO) and for Linux (ALSA, OSS, and JACK) however no work has commenced on the other platforms which are well supported by V18: the Macintosh (SoundManager, CoreAudio) and SGI (AL).
+At the time of writing, a substantial portion of V19 functionality has been implemented for Windows (MME, DirectSound, and ASIO) and for Linux (ALSA, OSS, and JACK), work has commenced on the SGI versions. However no work has commenced on the other platforms which are well supported by V18: the Macintosh (SoundManager, CoreAudio).
 </P>
 <P>
 The amount of development required to move from V18 release to V19 release has proven to be a significant obstacle to completing the V19 release. In hindsight it may have been preferable to plan an incremental change schedule for migrating implementations from V18 to the new version 2.0 API. However hindsight is of little benefit to us now, and we need a plan to finalise the V19 release, the remainder of this document is part of that plan.
@@ -181,7 +181,7 @@ All features marked <span class="done">green</span> are thought to be implemente
 <td class="done">oss</td>
 <td class="not_done">mac_sm</td>
 <td class="not_done">mac_core</td>
-<td class="not_done">sgi</td>
+<td class="done">sgi</td>
 </tr>
 
 <tr><td>maxInputChannels and maxOutputChannels fields of PaDeviceInfo (see <a href="002-ImproveDeviceFormatsQueryInterface.html">proposal 002</a>)</td>
@@ -193,7 +193,7 @@ All features marked <span class="done">green</span> are thought to be implemente
 <td class="not_done">oss</td>
 <td class="not_done">mac_sm</td>
 <td class="not_done">mac_core</td>
-<td class="not_done">sgi</td>
+<td class="unknown">sgi</td>
 </tr>
 
 <tr><td>defaultSampleRate field of PaDeviceInfo (see <a href="002-ImproveDeviceFormatsQueryInterface.html">proposal 002</a>)</td>
@@ -205,7 +205,7 @@ All features marked <span class="done">green</span> are thought to be implemente
 <td class="done">oss</td>
 <td class="not_done">mac_sm</td>
 <td class="not_done">mac_core</td>
-<td class="not_done">sgi</td>
+<td class="unknown">sgi</td>
 </tr>
 
 <tr><td>Pa_IsFormatSupported() (see <a href="002-ImproveDeviceFormatsQueryInterface.html">proposal 002</a>)</td>
@@ -337,7 +337,7 @@ All features marked <span class="done">green</span> are thought to be implemente
 <td class="done">oss</td>
 <td class="not_done">mac_sm</td>
 <td class="not_done">mac_core</td>
-<td class="not_done">sgi</td>
+<td class="done">sgi</td>
 </tr>
 
 <tr><td>deviceCount, defaultInputDevice, defaultOutputDevice fields of PaHostApiInfo (see <a href="007-MultipleHostAPIsInASingleBuild.html">proposal 007</a>)</td></td>
@@ -349,7 +349,7 @@ All features marked <span class="done">green</span> are thought to be implemente
 <td class="done">oss</td>
 <td class="not_done">mac_sm</td>
 <td class="not_done">mac_core</td>
-<td class="not_done">sgi</td>
+<td class="done">sgi</td>
 </tr>
 
 <tr><td>Host API Specific Pa_OpenStream() Parameters (see <a href="008-HostAPISpecificOpenStreamParameters.html">proposal 008</a>) -
@@ -374,7 +374,7 @@ platform specific extension, not required</td>
 <td class="unknown">oss</td>
 <td class="not_done">mac_sm</td>
 <td class="not_done">mac_core</td>
-<td class="not_done">sgi</td>
+<td class="unknown">sgi</td>
 </tr>
 
 <tr><td>All unexpected host API errors mapped to paUnanticipatedHostError using PaUtil_SetLastHostErrorInfo() (see <a href="009-HandlingHostAPISpecificErrorCodes.html">proposal 009</a>)</td>
@@ -386,7 +386,7 @@ platform specific extension, not required</td>
 <td class="unknown">oss</td>
 <td class="not_done">mac_sm</td>
 <td class="not_done">mac_core</td>
-<td class="not_done">sgi</td>
+<td class="unknown">sgi</td>
 </tr>
 
 <tr><td>implement IsStopped() correctly (see <a href="010-ClarifyStreamStateMachine.html">proposal 010</a> and pa_stream.h)</td>
@@ -398,7 +398,7 @@ platform specific extension, not required</td>
 <td class="unknown">oss</td>
 <td class="not_done">mac_sm</td>
 <td class="not_done">mac_core</td>
-<td class="not_done">sgi</td>
+<td class="unknown">sgi</td>
 </tr>
 
 <tr><td>implement IsActive() correctly (see <a href="010-ClarifyStreamStateMachine.html">proposal 010</a> and pa_stream.h)</td>
@@ -410,7 +410,7 @@ platform specific extension, not required</td>
 <td class="unknown">oss</td>
 <td class="not_done">mac_sm</td>
 <td class="not_done">mac_core</td>
-<td class="not_done">sgi</td>
+<td class="unknown">sgi</td>
 </tr>
 
 <tr><td>correctly handle paContinue result from callback (see <a href="010-ClarifyStreamStateMachine.html">proposal 010</a>)</td>
@@ -422,7 +422,7 @@ platform specific extension, not required</td>
 <td class="unknown">oss</td>
 <td class="not_done">mac_sm</td>
 <td class="not_done">mac_core</td>
-<td class="not_done">sgi</td>
+<td class="unknown">sgi</td>
 </tr>
 
 <tr><td>correctly handle paComplete result from callback (play out all enqueued buffers) (see <a href="010-ClarifyStreamStateMachine.html">proposal 010</a>)</td>
@@ -434,7 +434,7 @@ platform specific extension, not required</td>
 <td class="unknown">oss</td>
 <td class="not_done">mac_sm</td>
 <td class="not_done">mac_core</td>
-<td class="not_done">sgi</td>
+<td class="unknown">sgi</td>
 </tr>
 
 <tr><td>correctly handle paAbort result from callback (abort enqued buffers if possible) (see <a href="010-ClarifyStreamStateMachine.html">proposal 010</a>)</td>
@@ -446,7 +446,7 @@ platform specific extension, not required</td>
 <td class="unknown">oss</td>
 <td class="not_done">mac_sm</td>
 <td class="not_done">mac_core</td>
-<td class="not_done">sgi</td>
+<td class="unknown">sgi</td>
 </tr>
 
 <tr><td>correctly implement Pa_StopStrem() to play out all enqueued buffers</td>
@@ -458,7 +458,7 @@ platform specific extension, not required</td>
 <td class="unknown">oss</td>
 <td class="not_done">mac_sm</td>
 <td class="not_done">mac_core</td>
-<td class="not_done">sgi</td>
+<td class="unknown">sgi</td>
 </tr>
 
 <tr><td>implement Pa_AbortStream() to abort enqueued buffers where possible, and stop as quickly as possible</td>
@@ -470,7 +470,7 @@ platform specific extension, not required</td>
 <td class="unknown">oss</td>
 <td class="not_done">mac_sm</td>
 <td class="not_done">mac_core</td>
-<td class="not_done">sgi</td>
+<td class="unknown">sgi</td>
 </tr>
 
 <tr><td>implement Pa_GetStreamTime() (see <a href="015-ImproveCallbackTimestampInfo.html">proposal 015</a>) <span class="unknown">enhancement proposal says stream time increases while stream is open, not just while running, not sure if alsa implementation observes this.</span></td> 
@@ -482,7 +482,7 @@ platform specific extension, not required</td>
 <td class="unknown">oss</td>
 <td class="not_done">mac_sm</td>
 <td class="not_done">mac_core</td>
-<td class="not_done">sgi</td>
+<td class="unknown">sgi</td>
 </tr>
 
 <tr><td>pass correctly filled timeInfo field to the buffer adaptor (pa_process) (see <a href="015-ImproveCallbackTimestampInfo.html">proposal 015</a>)</td>
@@ -494,7 +494,7 @@ platform specific extension, not required</td>
 <td class="unknown">oss</td>
 <td class="not_done">mac_sm</td>
 <td class="not_done">mac_core</td>
-<td class="not_done">sgi</td>
+<td class="unknown">sgi</td>
 </tr>
 
 <tr><td>place actual sample rate in the sampleRate field of PaStreamInfo (see <a href="017-MethodForRetrievingActualStreamSampleRate.html">proposal 017</a>)<br>
@@ -507,7 +507,7 @@ platform specific extension, not required</td>
 <td class="unknown">oss</td>
 <td class="not_done">mac_sm</td>
 <td class="not_done">mac_core</td>
-<td class="not_done">sgi</td>
+<td class="unknown">sgi</td>
 </tr>
 
 <tr><td>call the stream finished callback (stream->streamRepresentation.streamFinishedCallback) at the appropriate times (see <a href="019-NotifyClientWhenAllBuffersHavePlayed.html">proposal 019</a>)</td>
@@ -519,7 +519,7 @@ platform specific extension, not required</td>
 <td class="done">oss</td>
 <td class="not_done">mac_sm</td>
 <td class="not_done">mac_core</td>
-<td class="not_done">sgi</td>
+<td class="unknown">sgi</td>
 </tr>
 
 <tr><td>Prime buffers during Pa_StartStream if the paPrimeOutputBuffersUsingStreamCallback flag is set, zero them if it isn't set (see <a href="020-AllowCallbackToPrimeStream.html">proposal 020</a>)<br>
@@ -576,9 +576,9 @@ The above status report needs to be taken in the context of the V18 release, the
 <H2>How Can I Help?</H2>
 
 <p>
-There are many ways in which you can help with V19 development. To begin with, simply try using it - the more people that use PortAudio V19, the more quickly we can find and fix problems. Read <a href="http://www.portaudio.com/docs/v19-doxydocs/">the documentation</a> and let us know if anything is confusing or unclear. Try compiling and running the tests which are known to work (see pa_tests/README.txt). Let us know about any problems you encounter. If you want to help out with development there are a number of simple tasks that you can work on, for example: write one of the missing sample converters in pa_converters.c, fix an existing test (see pa_tests/README.txt), or write a new test. If you know something about one of the host APIs that we already support, review our code to see if we could be doing something better. There's also the <a href="http://www.portaudio.com/docs/v19-doxydocs/todo.html">todo list</a>. We're looking for developers to port the Macintosh and SGI versions from V18 to V19 - there's a template for new implementations in pa_skeleton.c and you can look to the existing MME, DirectSound, ASIO, ALSA and JACK implementations for guidance. It's always a good idea to in check with existing developers on the <a href="http://www.portaudio.com/contacts.html">mailing list</a> before beginning a large task.
+There are many ways in which you can help with V19 development. To begin with, simply try using it - the more people that use PortAudio V19, the more quickly we can find and fix problems. Read <a href="http://www.portaudio.com/docs/v19-doxydocs/">the documentation</a> and let us know if anything is confusing or unclear. Try compiling and running the tests which are known to work (see pa_tests/README.txt). Let us know about any problems you encounter. If you want to help out with development there are a number of simple tasks that you can work on, for example: write one of the missing sample converters in pa_converters.c, fix an existing test (see pa_tests/README.txt), or write a new test. If you know something about one of the host APIs that we already support, review our code to see if we could be doing something better. There's also the <a href="http://www.portaudio.com/docs/v19-doxydocs/todo.html">todo list</a>. We're looking for developers to help port the Macintosh and SGI versions from V18 to V19 - there's a template for new implementations in pa_skeleton.c and you can look to the existing MME, DirectSound, ASIO, ALSA and JACK implementations for guidance. It's always a good idea to in check with existing developers on the <a href="http://www.portaudio.com/contacts.html">mailing list</a> before beginning a large task.
 </p>
 
 
 </BODY>
-</HTML>   ”
+</HTML>    
