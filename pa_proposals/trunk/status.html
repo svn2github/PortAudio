@@ -30,7 +30,7 @@ TD.na	{}
 </CENTER>
 
 <P><A href="http://www.portaudio.com/">PortAudio Home Page</A></P>
-<P>Updated: February 14, 2004 </P>
+<P>Updated: February 21, 2004 </P>
 
 <H2>Background</H2>
 
@@ -168,8 +168,20 @@ All features marked <span class="done">green</span> are thought to be implemente
 <td>sgi</td>
 </tr>
 
-<tr><td>Consistent handling of underflow and overflow conditions (see <a href="001-UnderflowOverflowHandling.html">proposal 001</a>). This includes passing information about dropped buffers to the buffer adaptor and correctly handling the paNeverDropInput OpenStream() flag.<br>
-<span class="not_done">implementations blocked waiting for common infrastructure support</span>
+<tr><td>Consistent handling of underflow and overflow conditions (see <a href="001-UnderflowOverflowHandling.html">proposal 001</a>). This includes passing information about dropped buffers to the buffer adaptor.<br>
+</td>
+<td class="not_done">wmme</td>
+<td class="not_done">ds</td>
+<td class="not_done">asio</td>
+<td class="not_done">alsa</td>
+<td class="not_done">jack</td>
+<td class="not_done">oss</td>
+<td class="not_done">mac_sm</td>
+<td class="not_done">mac_core</td>
+<td class="not_done">sgi</td>
+</tr>
+
+<tr><td>Correctly handling the paNeverDropInput OpenStream() flag. (see <a href="001-UnderflowOverflowHandling.html">proposal 001</a>)<br>
 </td>
 <td class="not_done">wmme</td>
 <td class="not_done">ds</td>
@@ -232,7 +244,7 @@ All features marked <span class="done">green</span> are thought to be implemente
 </tr>
 
 <tr><td>Pa_IsFormatSupported() when paUseHostApiSpecificDeviceSpecification or hostApiSpecificStreamInfo is used (see <a href="002-ImproveDeviceFormatsQueryInterface.html">proposal 002</a>)</td>
-<td class="not_done">wmme</td>
+<td class="done">wmme</td>
 <td class="na">ds</td>
 <td class="na">asio</td>
 <td class="na">alsa</td>
@@ -764,7 +776,7 @@ Note that these tests don't yet cover every feature of the V19 API. The tests fr
 <td class="done">sgi</td>
 </tr>
 
-<tr><td>patest_mono.c</td><td> <span class="not_done">missing</span> </td>
+<tr><td>patest_mono.c</td><td> <span class="not_done">not yet ported to V19 api</span> </td>
 <td class="unknown">wmme</td>
 <td class="unknown">ds</td>
 <td class="unknown">asio</td>
@@ -920,7 +932,7 @@ Note that these tests don't yet cover every feature of the V19 API. The tests fr
 <td class="done">sgi</td>
 </tr>
 
-<tr><td>patest_two_rates.c</td><td> <span class="not_done">missing</span> </td>
+<tr><td>patest_two_rates.c</td><td> <span class="not_done">not yet ported to V19 api</span> </td>
 <td class="unknown">wmme</td>
 <td class="unknown">ds</td>
 <td class="unknown">asio</td>
@@ -1073,4 +1085,4 @@ There are many ways in which you can help with V19 development. To begin with, s
 
 
 </BODY>
-</HTML>  ` 
+</HTML>   8
