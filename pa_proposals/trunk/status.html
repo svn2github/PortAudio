@@ -30,7 +30,7 @@ TD.na	{}
 </CENTER>
 
 <P><A href="http://www.portaudio.com/">PortAudio Home Page</A></P>
-<P>Updated: November 27, 2003 </P>
+<P>Updated: December 27, 2003 </P>
 
 <H2>Background</H2>
 
@@ -193,7 +193,7 @@ All features marked <span class="done">green</span> are thought to be implemente
 <td class="not_done">oss</td>
 <td class="not_done">mac_sm</td>
 <td class="not_done">mac_core</td>
-<td class="unknown">sgi</td>
+<td class="done">sgi</td>
 </tr>
 
 <tr><td>defaultSampleRate field of PaDeviceInfo (see <a href="002-ImproveDeviceFormatsQueryInterface.html">proposal 002</a>)</td>
@@ -217,7 +217,7 @@ All features marked <span class="done">green</span> are thought to be implemente
 <td class="done">oss</td>
 <td class="not_done">mac_sm</td>
 <td class="not_done">mac_core</td>
-<td class="not_done">sgi</td>
+<td class="done">sgi</td>
 </tr>
 
 <tr><td>Pa_IsFormatSupported() when paUseHostApiSpecificDeviceSpecification or hostApiSpecificStreamInfo is used (see <a href="002-ImproveDeviceFormatsQueryInterface.html">proposal 002</a>)</td>
@@ -241,7 +241,7 @@ All features marked <span class="done">green</span> are thought to be implemente
 <td class="unknown">oss</td>
 <td class="not_done">mac_sm</td>
 <td class="not_done">mac_core</td>
-<td class="not_done">sgi</td>
+<td class="done">sgi</td>
 </tr>
 
 <tr><td>defaultLowInputLatency, defaultLowOutputLatency fields of PaDeviceInfo (see <a href="003-ImproveLatencySpecificationInterface.html">proposal 003</a>)</td>
@@ -253,7 +253,7 @@ All features marked <span class="done">green</span> are thought to be implemente
 <td class="unknown">oss</td>
 <td class="not_done">mac_sm</td>
 <td class="not_done">mac_core</td>
-<td class="not_done">sgi</td>
+<td class="done">sgi</td>
 </tr>
 
 <tr><td>defaultHighInputLatency, defaultHighOutputLatency fields of PaDeviceInfo (see <a href="003-ImproveLatencySpecificationInterface.html">proposal 003</a>)</td>
@@ -265,7 +265,7 @@ All features marked <span class="done">green</span> are thought to be implemente
 <td class="unknown">oss</td>
 <td class="not_done">mac_sm</td>
 <td class="not_done">mac_core</td>
-<td class="not_done">sgi</td>
+<td class="doneone">sgi</td>
 </tr>
 
 <tr><td>inputLatency and outputLatency fields of PaStreamInfo (see <a href="003-ImproveLatencySpecificationInterface.html">proposal 003</a>)</td>
@@ -277,7 +277,7 @@ All features marked <span class="done">green</span> are thought to be implemente
 <td class="not_done">oss</td>
 <td class="not_done">mac_sm</td>
 <td class="not_done">mac_core</td>
-<td class="not_done">sgi</td>
+<td class="done">sgi</td>
 </tr>
 
 <tr><td>framesPerBuffer value of paFramesPerBufferUnspecified (0) for OpenStream() to indicate variable implementation specified frames per buffer (see <a href="004-CallbackVariableFramesPerBuffer.html">proposal 004</a>)</td>
@@ -289,7 +289,7 @@ All features marked <span class="done">green</span> are thought to be implemente
 <td class="not_done">oss</td>
 <td class="not_done">mac_sm</td>
 <td class="not_done">mac_core</td>
-<td class="not_done">sgi</td>
+<td class="done">sgi</td>
 </tr>
 
 <tr><td>Pa_ReadStream() (see <a href="005-BlockingReadWriteInterface.html">proposal 005</a>)</td>
@@ -301,7 +301,7 @@ All features marked <span class="done">green</span> are thought to be implemente
 <td class="not_done">oss</td>
 <td class="not_done">mac_sm</td>
 <td class="not_done">mac_core</td>
-<td class="not_done">sgi</td>
+<td class="done">sgi</td>
 </tr>
 
 <tr><td>Pa_WriteStream() (see <a href="005-BlockingReadWriteInterface.html">proposal 005</a>)</td>
@@ -313,7 +313,7 @@ All features marked <span class="done">green</span> are thought to be implemente
 <td class="not_done">oss</td>
 <td class="not_done">mac_sm</td>
 <td class="not_done">mac_core</td>
-<td class="not_done">sgi</td>
+<td class="done">sgi</td>
 </tr>
 
 <tr><td>Pa_GetStreamReadAvailable() (see <a href="005-BlockingReadWriteInterface.html">proposal 005</a>)</td>
@@ -325,7 +325,7 @@ All features marked <span class="done">green</span> are thought to be implemente
 <td class="not_done">oss</td>
 <td class="not_done">mac_sm</td>
 <td class="not_done">mac_core</td>
-<td class="not_done">sgi</td>
+<td class="done">sgi</td>
 </tr>
 
 <tr><td>Pa_GetStreamWriteAvaliable() (see <a href="005-BlockingReadWriteInterface.html">proposal 005</a>)</td>
@@ -337,7 +337,7 @@ All features marked <span class="done">green</span> are thought to be implemente
 <td class="not_done">oss</td>
 <td class="not_done">mac_sm</td>
 <td class="not_done">mac_core</td>
-<td class="not_done">sgi</td>
+<td class="done">sgi</td>
 </tr>
 
 <tr><td>basic PaHostApiInfo support (structVersion, type, name) (see <a href="007-MultipleHostAPIsInASingleBuild.html">proposal 007</a>)</td>
@@ -386,7 +386,7 @@ platform specific extension, not required</td>
 <td class="unknown">oss</td>
 <td class="not_done">mac_sm</td>
 <td class="not_done">mac_core</td>
-<td class="unknown">sgi</td>
+<td class="done">sgi</td>
 </tr>
 
 <tr><td>All unexpected host API errors mapped to paUnanticipatedHostError using PaUtil_SetLastHostErrorInfo() (see <a href="009-HandlingHostAPISpecificErrorCodes.html">proposal 009</a>)</td>
@@ -398,7 +398,7 @@ platform specific extension, not required</td>
 <td class="unknown">oss</td>
 <td class="not_done">mac_sm</td>
 <td class="not_done">mac_core</td>
-<td class="unknown">sgi</td>
+<td class="done">sgi</td>
 </tr>
 
 <tr><td>implement IsStopped() correctly (see <a href="010-ClarifyStreamStateMachine.html">proposal 010</a> and pa_stream.h)</td>
@@ -410,7 +410,7 @@ platform specific extension, not required</td>
 <td class="unknown">oss</td>
 <td class="not_done">mac_sm</td>
 <td class="not_done">mac_core</td>
-<td class="unknown">sgi</td>
+<td class="done">sgi</td>
 </tr>
 
 <tr><td>implement IsActive() correctly (see <a href="010-ClarifyStreamStateMachine.html">proposal 010</a> and pa_stream.h)</td>
@@ -422,7 +422,7 @@ platform specific extension, not required</td>
 <td class="unknown">oss</td>
 <td class="not_done">mac_sm</td>
 <td class="not_done">mac_core</td>
-<td class="unknown">sgi</td>
+<td class="done">sgi</td>
 </tr>
 
 <tr><td>correctly handle paContinue result from callback (see <a href="010-ClarifyStreamStateMachine.html">proposal 010</a>)</td>
@@ -434,7 +434,7 @@ platform specific extension, not required</td>
 <td class="unknown">oss</td>
 <td class="not_done">mac_sm</td>
 <td class="not_done">mac_core</td>
-<td class="unknown">sgi</td>
+<td class="done">sgi</td>
 </tr>
 
 <tr><td>correctly handle paComplete result from callback (play out all enqueued buffers) (see <a href="010-ClarifyStreamStateMachine.html">proposal 010</a>)</td>
@@ -446,7 +446,7 @@ platform specific extension, not required</td>
 <td class="unknown">oss</td>
 <td class="not_done">mac_sm</td>
 <td class="not_done">mac_core</td>
-<td class="unknown">sgi</td>
+<td class="done">sgi</td>
 </tr>
 
 <tr><td>correctly handle paAbort result from callback (abort enqued buffers if possible) (see <a href="010-ClarifyStreamStateMachine.html">proposal 010</a>)</td>
@@ -458,7 +458,7 @@ platform specific extension, not required</td>
 <td class="unknown">oss</td>
 <td class="not_done">mac_sm</td>
 <td class="not_done">mac_core</td>
-<td class="unknown">sgi</td>
+<td class="done">sgi</td>
 </tr>
 
 <tr><td>correctly implement Pa_StopStrem() to play out all enqueued buffers</td>
@@ -470,7 +470,7 @@ platform specific extension, not required</td>
 <td class="unknown">oss</td>
 <td class="not_done">mac_sm</td>
 <td class="not_done">mac_core</td>
-<td class="unknown">sgi</td>
+<td class="done">sgi</td>
 </tr>
 
 <tr><td>implement Pa_AbortStream() to abort enqueued buffers where possible, and stop as quickly as possible</td>
@@ -482,7 +482,7 @@ platform specific extension, not required</td>
 <td class="unknown">oss</td>
 <td class="not_done">mac_sm</td>
 <td class="not_done">mac_core</td>
-<td class="unknown">sgi</td>
+<td class="done">sgi</td>
 </tr>
 
 <tr><td>implement Pa_GetStreamTime() (see <a href="015-ImproveCallbackTimestampInfo.html">proposal 015</a>) <span class="unknown">enhancement proposal says stream time increases while stream is open, not just while running, not sure if alsa implementation observes this.</span></td> 
@@ -494,7 +494,7 @@ platform specific extension, not required</td>
 <td class="unknown">oss</td>
 <td class="not_done">mac_sm</td>
 <td class="not_done">mac_core</td>
-<td class="unknown">sgi</td>
+<td class="done">sgi</td>
 </tr>
 
 <tr><td>pass correctly filled timeInfo field to the buffer adaptor (pa_process) (see <a href="015-ImproveCallbackTimestampInfo.html">proposal 015</a>)</td>
@@ -506,7 +506,7 @@ platform specific extension, not required</td>
 <td class="unknown">oss</td>
 <td class="not_done">mac_sm</td>
 <td class="not_done">mac_core</td>
-<td class="unknown">sgi</td>
+<td class="done">sgi</td>
 </tr>
 
 <tr><td>place actual sample rate in the sampleRate field of PaStreamInfo (see <a href="017-MethodForRetrievingActualStreamSampleRate.html">proposal 017</a>)<br>
@@ -519,7 +519,7 @@ platform specific extension, not required</td>
 <td class="unknown">oss</td>
 <td class="not_done">mac_sm</td>
 <td class="not_done">mac_core</td>
-<td class="unknown">sgi</td>
+<td class="done">sgi</td>
 </tr>
 
 <tr><td>call the stream finished callback (stream->streamRepresentation.streamFinishedCallback) at the appropriate times (see <a href="019-NotifyClientWhenAllBuffersHavePlayed.html">proposal 019</a>)</td>
@@ -545,7 +545,7 @@ platform specific extension, not required</td>
 <td class="not_done">oss</td>
 <td class="not_done">mac_sm</td>
 <td class="not_done">mac_core</td>
-<td class="not_done">sgi</td>
+<td class="done">sgi</td>
 </tr>
 
 <tr><td>Pass paPrimingOutput to stream callback when priming the buffers in response to paPrimeOutputBuffersUsingStreamCallback (see <a href="020-AllowCallbackToPrimeStream.html">proposal 020</a>)</td>
@@ -557,7 +557,7 @@ platform specific extension, not required</td>
 <td class="not_done">oss</td>
 <td class="not_done">mac_sm</td>
 <td class="not_done">mac_core</td>
-<td class="not_done">sgi</td>
+<td class="done">sgi</td>
 </tr>
 
 <tr><td>Pass paInputUnderflow to stream callback when priming a full duplex stream's buffers in response to paPrimeOutputBuffersUsingStreamCallback (see <a href="020-AllowCallbackToPrimeStream.html">proposal 020</a>)</td>
@@ -569,7 +569,7 @@ platform specific extension, not required</td>
 <td class="not_done">oss</td>
 <td class="not_done">mac_sm</td>
 <td class="not_done">mac_core</td>
-<td class="not_done">sgi</td>
+<td class="done">sgi</td>
 </tr>
 </table>
 
@@ -593,4 +593,4 @@ There are many ways in which you can help with V19 development. To begin with, s
 
 
 </BODY>
-</HTML>   Á
+</HTML>   ×
