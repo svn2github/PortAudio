@@ -1,0 +1,86 @@
+<HTML>
+
+<HEAD>
+<TITLE>Proposed Changes to PortAudio</TITLE>
+<META content="Phil Burk, Ross Bencina" name=Author>
+<META content="Changes being discussed by the community of PortAudio deveopers." name=Description>
+<META 
+content="PortAudio, audio, tutorial, library, portable, open-source, DirectSound, sound, music, JSyn, AudioMulch, synthesis" name=KeyWords>
+</HEAD>
+
+<BODY LINK="#0000ff" VLINK="#800080">
+
+<CENTER>
+<H3>Proposed Enhancements to PortAudio API</H3>
+<H1>013 - Refactor Implementation Infrastructure</H1>
+</CENTER>
+
+<P><A href="index.html">Enhancement Proposals Index</A>,
+<A href="http://www.portaudio.com/">PortAudio Home Page</A></P>
+<P>Updated: July 23, 2002 </P>
+
+<H4>Status</H4>
+
+<P>
+This proposal is out-of-date and needs to be revised to reflect the refactoring which has
+already been performed in the v19-devel branch. At this stage it's unclear whether further
+refactoring is possible - buffer conversion routines for blocking read/write routines 
+still need to be written.
+</P>
+
+<H4>Dependencies</H4>
+
+<P>
+This proposal is dependent on the <A HREF="#MultipleDriverModels">Support for Multiple Host APIs in a Single PortAudio Build</A> proposal, and the <A HREF="#Interleaved">Non-Interleaved Buffers</A> proposal. The proposed conversion functions may be dependent on the MME multichannel via stereo pairs extension which is part of the <A HREF="#DriverModelSpecificPa_OpenStream">Host API Specific Pa_OpenStream() Parameters</A> proposal.
+</P>
+
+<H4>Background</H4>
+
+<P>PortAudio defines a set of helper functions that all implementations share. It is envisaged that these internal functions will need to be revised in response to the changes proposed in this document. It would also be beneficial to take this opportunity to refactor any other common code fragments that could be shared by multiple implementations.</P>
+<P>A refactoring of the buffer data conversion functions was proposed here: <A HREF="http://techweb.rfa.org/pipermail/portaudio/2001-November/000244.html">http://techweb.rfa.org/pipermail/portaudio/2001-November/000244.html</A> However the proposal below is not quite the same. A significant benefit of formally specifying the interface to the buffer conversion functions is that it would facilitate the creation of optimised assembly language versions for different platforms.</P>
+
+<H4>Proposal</H4>
+
+<P>A common set of buffer conversion functions should be defined and shared by all implementations. The buffer conversion functions should handle all permutations of:</P>
+
+<UL>
+<LI>Sample format </LI>
+<LI>Channels </LI>
+<LI>Interleave / Non-interleave </LI>
+<LI>Endianness </LI>
+<LI>Channel compensation</LI></UL>
+
+<P>"Channel-compensation" is necessary when certain devices require a higher number of channels than the user requests. With the Midiman Delta1010, for example, the device always needs to be fed 10 channels of output and you must read 12 channels of input (at least under ALSA without the "plug" interface).</P>
+<P>The conversion functions could look something like:</P>
+<PRE>void ConversionFunction_DestType_DestInterleave_SrcType_SrcInterleave_ ( void *dest, int destChannels, void *src, int srcChannels, int frames );</PRE>
+<P>The dest and src parameters have the same format as those supplied to the PortAudio client callback.</P>
+<P>Rather than have each implementation call these conversion functions directly, a 'factory function' could be implemented that returns a pointer to a conversion function based on parameters specifying the format of the source and destination buffers. This factory function could be called as needed when a stream is opened. The conversion functions could then be made static and hidden from the rest of PortAudio. The 'factory function' could have the following form:</P>
+<PRE>enum PaEndiannes { paBigEndian, paSmallEndian, paHostEndian };
+
+PaBufferConversionFunction* Pa_GetBufferConversionFunction( 
+    PaSampleFormat destFormat, int destChannels, PaEndianness destEndianness,
+    PaSampleFormat srcFormat, int srcChannels, PaEndianness srcEndianness );</PRE>
+<P>Note that the interleave/deinterleave status is encoded in the destFormat and srcFormat parameters. paHostEndian is used to represent the endianness of the current platform since some host APIs (eg ASIO) allow the driver to use samples in a different endianness from the host endianness. Another alternative is to encode sample endianness in PaSampleFormat - this would allow clients to write sample data of either endianness to PortAudio (e.g. soundfile playback direct from file) and benefit from PortAudio's byte swapping code.</P>
+<P>The redundant use of channel parameters in both the conversion functions and the factory function is intentional and would allow channel-optimised conversion functions to be supplied for common cases such as 16-bit stereo.</P>
+
+<H4>Discussion</H4>
+
+<P>This proposal currently only addresses buffer conversion functions, however it is important to identify other common code fragments that could be placed in the shared PortAudio library.</P>
+<P>This proposal has not yet addressed the fact that the conversion functions also need to handle clipping and dithering.</P>
+<P>It is not clear whether additional conversion functions will be needed to accommodate the MME interleaved stereo pairs for multichannel devices proposal.</P>
+<P>It hasn't been established whether PortAudio will be extended to support all PaSampleFormats on all devices.</P>
+<P>It isn't clear whether paCustomFormat is viable under this proposal, or how it would be accommodated.</P>
+<P>When the client requested format and the host format are different a temporary buffer may be required to hold the converted data. However, in general PortAudio should aim to convert data in-place. Functions may be needed to establish when temporary buffers are needed, and to allocate them.</P>
+<P>Due to a mismatch between the API buffer size and the PortAudio callback buffer size some Host APIs require PortAudio to shuffle data among multiple buffers in order to fulfil client requests - this has not yet been considered within the current proposal.</P>
+<P>Memory allocation should probably be handled with platform specific functions such as Win32 GlobalAlloc() rather than using malloc()</P>
+
+<H4>Impact Analysis</H4>
+
+<P>
+This proposal only effects PortAudio implementors. Increasing the utility of shared code will improve the quality of all PortAudio implementations in terms of speed, size, and robustness. It should also reduce the effort involved in porting PortAudio to a new host API.
+</P>
+
+
+
+</BODY>
+</HTML>

@@ -1,0 +1,72 @@
+<HTML>
+
+<HEAD>
+<TITLE>Proposed Changes to PortAudio</TITLE>
+<META content="Phil Burk, Ross Bencina" name=Author>
+<META content="Changes being discussed by the community of PortAudio deveopers." name=Description>
+<META 
+content="PortAudio, audio, tutorial, library, portable, open-source, DirectSound, sound, music, JSyn, AudioMulch, synthesis" name=KeyWords>
+</HEAD>
+
+<BODY LINK="#0000ff" VLINK="#800080">
+
+<CENTER>
+<H3>Proposed Enhancements to PortAudio API</H3>
+<H1>011 - Rename Existing Symbols such as Pa_GetCPULoad(), PaDeviceID etc. for Consistency</H1>
+</CENTER>
+
+<P><A href="index.html">Enhancement Proposals Index</A>,
+<A href="http://www.portaudio.com/">PortAudio Home Page</A></P>
+<P>Updated: July 23, 2002 </P>
+
+<H4>Status</H4>
+
+<P>This proposal is sufficiently well defined to be implemented and has been implemented in v19-devel.</P>
+
+<H4>Background</H4>
+
+<P>
+PortAudio functions that return global information typically have names of the form Pa_Get*() (eg. Pa_GetDeviceInfo). However functions retrieving information from a stream do not currently (V18) follow this convention (Pa_StreamActive() and Pa_StreamTime()), additionally the Pa_GetCPULoad() function operates on a stream, but does not contain stream in its name.
+</P>
+
+<P>
+PortAudio functions and parameter names that operate on integer identifiers use the string ID (all uppercase.) The paInvalidDeviceId error code is an exception to this convention.
+</P>
+
+<H4>Proposal</H4>
+
+<p>Rename the stream accessor functions as follows:</p>
+
+<pre>
+Pa_StreamActive() -> Pa_IsStreamActive()
+Pa_StreamTime() -> Pa_GetStreamTime()
+Pa_GetCPULoad() -> Pa_GetStreamCpuLoad()
+</pre>
+
+<p>
+Note that CPU becomes Cpu, the convention of only capitalising the first letter of an acronym has been adopted in other proposals too.</p>
+
+<p>Rename device identifier types and functions as follows:</p>
+
+<pre>
+paInvalidDeviceId -> paInvalidDevice
+PaDeviceID -> PaDeviceIndex
+Pa_GetDefaultInputDeviceID() -> Pa_GetDefaultInputDevice()
+Pa_GetDefaultOutputDeviceID() -> Pa_GetDefaultOutputDevice()
+</pre>
+
+<p>
+The use of the term index in PaDeviceIndex clearly denotes that the types has values within a closed range and may be incremented or decremented to access adjacent values. The ommission of "Index" from paInvalidDevice and the Pa_GetDefault* functions is justified by the fact that the only public representation of a device is its index.
+</p>
+
+<H4>Impact Analysis</H4>
+
+<P>
+This proposal improves the consistency of the naming scheme making the API easier to learn and remember. All clients which currently call Pa_GetCPULoad(), Pa_StreamTime(), Pa_StreamActive(), Pa_GetDefaultInputDeviceID(), or Pa_GetDefaultOutputDeviceID() will need to alter their code by renaming the function call. Clients who explicitly check for the paInvalidDeviceId error code, or use the PaDeviceID type will have to edit the spelling of these identifiers.
+</P>
+
+
+
+
+</BODY>
+</HTML>
