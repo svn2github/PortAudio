@@ -17,11 +17,11 @@ content="PortAudio, audio, tutorial, library, portable, open-source, DirectSound
 
 <P><A href="index.html">Enhancement Proposals Index</A>,
 <A href="http://www.portaudio.com/">PortAudio Home Page</A></P>
-<P>Updated: August 20, 2002 </P>
+<P>Updated: August 24, 2002 </P>
 
 <H4>Status</H4>
 
-<P>This proposal is under discussion.</P>
+<P>This proposal is sufficiently well defined to be implemented.</P>
 
 <H4>Background</H4>
 
@@ -32,22 +32,22 @@ The current version of Pa_OpenStream() has 16 parameters. This is a very large n
 <H4>Proposal</H4>
 
 <P>
-Define a new structure called PaDeviceParameters: 
+Define a new structure called PaStreamParameters: 
 </P>
 
 <PRE>
-typedef struct PaDeviceParameters{
+typedef struct PaStreamParameters{
      PaDeviceIndex device;
      int numChannels;
      PaSampleFormat sampleFormat;
      PaTime latency;
      void *hostApiSpecificStreamInfo;
-}PaDeviceParameters;
+}PaStreamParameters;
 </PRE>
 
 <P>
-Replace existing input and output device parameter fields in
-Pa_OpenStream() with pointers to PaDeviceParameters structures.
+Replace existing input and output parameter fields in
+Pa_OpenStream() with pointers to PaStreamParameters structures.
 </P>
 
 <PRE>
@@ -63,19 +63,22 @@ Pa_OpenStream() with pointers to PaDeviceParameters structures.
 </PRE>
 
 <P>
-The same could be done for Pa_IsFormatSupported():
+The new Pa_IsFormatSupported() function defined 
+<A href="002-ImproveDeviceFormatsQueryInterface.html">here</a> would also use pointers 
+to PaStreamParameters structures:
 </P>
 
 <PRE>
-Pa_IsFormatSupported(
+PaError Pa_IsFormatSupported(
    PaStreamParameters *inputParameters,
    PaStreamParameters *outputParameters,
    double sampleRate );
 </PRE>
 
 <P>
-Half duplex streams should pass NULL for the parameter structure which they are
-not using.
+When opening a half duplex stream with Pa_OpenStream(), or querying half duplex format 
+capabilities with Pa_IsFormatSupported(), clients should pass NULL for the 
+parameter structure covering the unused direction.
 </P>
 
 
@@ -98,15 +101,18 @@ inputParameters.hostApiSpecificStreamInfo = NULL;
 
 
 <P>
-
+The new implementation (V19) of PortAudio provides support for all
+sample formats, so the value of PaStreamParameters::sampleFormat will not
+be relevant to Pa_IsFormatSupported(). Using the PaStreamParameters structure 
+for Pa_IsFormatSupported() parameters
+is still considered to be worthwhile. 
 </P>
-
 
 
 <H4>Impact Analysis</H4>
 
 <P>
-This proposal will require clients that use Pa_OpenStream() to rewrite the parameter passing code.
+This proposal will require clients that use Pa_OpenStream() to rewrite their parameter passing code.
 </P>
 
 
