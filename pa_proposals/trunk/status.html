@@ -30,7 +30,7 @@ TD.na	{}
 </CENTER>
 
 <P><A href="http://www.portaudio.com/">PortAudio Home Page</A></P>
-<P>Updated: December 27, 2003 </P>
+<P>Updated: January 7, 2004 </P>
 
 <H2>Background</H2>
 
@@ -38,10 +38,10 @@ TD.na	{}
 For some years PortAudio development proceeded incrementally - bugs were fixed, new implementations were created and a few features were added. Around the time of the original V18 release in 2001 a big list of requested features existed, and there were many separate implementations of the PortAudio API, some with more cut-and-paste commonality than code sharing. Due to a combination of forces, most notably the desire to support multiple Host APIs in a single PortAudio build, it was decided to develop a new unified common infrastructure (support library) with which to implement V19. At that time the feature requests were developed into a set of <a href="index.html">enhancement proposals</a> which describe the new (Version 2.0) PortAudio API now documented in V19's <a href="http://www.portaudio.com/docs/v19-doxydocs/portaudio_8h.html">portaudio.h</a>. The proposals have been stable for some time (close to a year). The common infrastructure is now largely implemented in the <a href="http://www.portaudio.com/usingcvs.html">v19-devel CVS branch</a>, and the version 2.0 API is well documented, and available as part of the <a href="http://www.portaudio.com/docs/v19-doxydocs/">doxygen generated documentation</a>.
 </P>
 
-<P>Although each proposal is relatively small when taken in isolation, the overall scale of required changes from V18 to V19 is substantial. The new common infrastructure imposes a new interface for implementations. This new interface increases reliability and consistency and reduces development effort, but requires considerable refactoring (some would say redevelopment) of existing PortAudio implementations relative to the V18 code base. 
+<P>Although each proposal is relatively small when taken in isolation, the overall scale of required changes from V18 to V19 is substantial. The new common infrastructure imposes a new interface for implementations. This new interface increases reliability and consistency and reduces development effort, but calls for considerable refactoring (some would say redevelopment) of existing PortAudio implementations relative to the V18 code base. 
 </P>
 <P>
-At the time of writing, a substantial portion of V19 functionality has been implemented for Windows (MME, DirectSound, and ASIO) and for Linux (ALSA, OSS, and JACK), work has commenced on the SGI versions. However no work has commenced on the other platforms which are well supported by V18: the Macintosh (SoundManager, CoreAudio).
+At the time of writing, a substantial portion of V19 functionality has been implemented for Windows (MME, DirectSound, and ASIO) for Linux (ALSA, OSS, and JACK), and SGI. However no work has commenced on the Macintosh (SoundManager, CoreAudio) which was well supported by V18. The current ASIO version has not been back-ported to the Macintosh, however it would require little effort to do so.
 </P>
 <P>
 The amount of development required to move from V18 release to V19 release has proven to be a significant obstacle to completing the V19 release. In hindsight it may have been preferable to plan an incremental change schedule for migrating implementations from V18 to the new version 2.0 API. However hindsight is of little benefit to us now, and we need a plan to finalise the V19 release, the remainder of this document is part of that plan.
@@ -66,6 +66,10 @@ With some possible exceptions (such as (1) addition of new backward compatible s
 
 <H3>Common Infrastructure</H3>
 
+<p>
+The list below indicates issues related to the common infrastructure code which is shared by all implementations. Items marked todo on these list still require work.
+</p>
+
 <ul>
 <li>Internal interface documentation (need to finish pa_process.h documentation) 
 <span class="done">done</span>
@@ -83,6 +87,9 @@ With some possible exceptions (such as (1) addition of new backward compatible s
 <span class="not_done">todo</span>
 
 <li>Underflow/overflow flags underspecified interaction with the callback adapter when buffer adaption is being used.
+<span class="done">done</span>
+
+<li>Support Underflow/overflow flags and paNeverDropInput in pa_process.c
 <span class="not_done">todo</span>
 
 <li>No way to query the buffer adaptor about the amount of latency it introduces
@@ -128,16 +135,20 @@ With some possible exceptions (such as (1) addition of new backward compatible s
 
 <li>Provide version information via Pa_GetVersion() and Pa_GetVersionText() (see <a href="018-VersionInformationInterface.html">proposal 018</a>) <span class="done">done</span>
 
+<li>Proposal 004, (among others), is not tested by any of the current pa_tests
+<span class="not_done">todo</span>
+
+
 </ul>
 
-<H3>Host API Implementations</H3>
+<H3>Host API Feature Implementation</H3>
 
 <p>
 The list below describe API features which must be implemented by each implementation. In most cases the implementation status of these features will only effect clients who make use of these features, they do not effect the functioning of other aspects of the API.
 </p>
 
 <p>
-All features marked <span class="done">green</span> are thought to be implemented correctly, however this does not preclude bugs. Some features marked <span class="not_done">red</span> may be partially implemented or include placeholder hacks which may make them appear to work in some situations. The status of features marked <span class="unknown">yellow</span> is not presently known - developers who wrote or understand the code are requested to clarify and report the status of the entries marked yellow.
+All features marked <span class="done">green</span> are thought to be implemented correctly, however this does not preclude bugs. Some features marked <span class="not_done">red</span> may be partially implemented or include placeholder hacks which may make them appear to work in some situations. The status of features marked <span class="unknown">yellow</span> is not presently known - developers who wrote or understand the code are requested to clarify and report the status of the entries marked yellow. Features marked <span class="na">white</span> are not applicable (for example it's not possible to implement the blocking API with Jack).
 </p>
 
 <p>Key: wmme - Windows Multimedia API (MME), ds - Windows DirectSound, asio - Steinberg ASIO (Mac and PC, Mac not tested under V19 as of September 17 2003), alsa - Advanced Linux Sound Architecture, oss - Open Sound System (Unix), mac_sm - Macintosh Sound Manager (Carbon, pre-OS X), mac_core - Mac OS X Core Audio, sgi - Silicon Graphics AL. 
@@ -577,12 +588,415 @@ platform specific extension, not required</td>
 If there is a specific feature which has been implemented, but is not listed above, please report it so it can be added to the list.
 </p>
 
+<p>
+The above status report needs to be taken in the context of the V18 release, the features it implemented (and didn't implement), and the quality and consistency of its implementations. For example many features listed above were not part of the V18 API, some were not consistently implemented accross all platforms, and some of the bug-like items were also present in V18. So the overall conclusion is that V19 is in pretty good shape. Aside from the total lack of support on the Mac at this stage, the V19 API is moderately functional on all other platforms, in many cases to a level that matches or surpasses V18.
+</p>
+
+<H3>Tests</H3>
+
+<p>
+The following table indicates the status of running each test in /pa_tests with each Host API. <span class="not_done">Red</span> means a test fails, <span class="done">green</span> means the test passes and <span class="unknown">yellow</span> means the test result is unknown (perhaps you'd like to run the test and report the result for us).
+</p>
+
+<p>
+Note that these tests don't yet cover every feature of the V19 API. All of the tests from the V18 PortAudio release are listed below, which should give some indication of the degree to which V19-devel currently implements the V18 feature set.
+</p>
+
+<table border="1">
+
+<tr><td><b>Test</b></td>
+<td>Description</td>
+<td>wmme</td>
+<td>ds</td>
+<td>asio</td>
+<td>alsa</td>
+<td>jack</td>
+<td>oss</td>
+<td>mac_sm</td>
+<td>mac_core</td>
+<td>sgi</td>
+</tr>
+
+<tr><td>paqa_devs.c</td><td> Self Testing Quality Assurance app for PortAudio Try to open each device and run through all the possible configurations</td>
+<td class="unknown">wmme</td>
+<td class="unknown">ds</td>
+<td class="unknown">asio</td>
+<td class="unknown">alsa</td>
+<td class="unknown">jack</td>
+<td class="unknown">oss</td>
+<td class="unknown">mac_sm</td>
+<td class="unknown">mac_core</td>
+<td class="done">sgi</td>
+</tr>
+
+<tr><td>paqa_errs.c</td><td> Self Testing Quality Assurance app for PortAudio Do lots of bad things to test error reporting </td>
+<td class="unknown">wmme</td>
+<td class="unknown">ds</td>
+<td class="unknown">asio</td>
+<td class="unknown">alsa</td>
+<td class="unknown">jack</td>
+<td class="unknown">oss</td>
+<td class="unknown">mac_sm</td>
+<td class="unknown">mac_core</td>
+<td class="unknown">sgi</td>
+</tr>
+
+<tr><td>patest1.c</td><td> Ring modulate the audio input with a sine wave for 20 seconds</td>
+<td class="unknown">wmme</td>
+<td class="unknown">ds</td>
+<td class="unknown">asio</td>
+<td class="unknown">alsa</td>
+<td class="unknown">jack</td>
+<td class="unknown">oss</td>
+<td class="unknown">mac_sm</td>
+<td class="unknown">mac_core</td>
+<td class="done">sgi</td>
+</tr>
+
+<tr><td>patest_buffer.c</td><td> Test opening streams with different buffer sizes </td>
+<td class="unknown">wmme</td>
+<td class="unknown">ds</td>
+<td class="unknown">asio</td>
+<td class="unknown">alsa</td>
+<td class="unknown">jack</td>
+<td class="unknown">oss</td>
+<td class="unknown">mac_sm</td>
+<td class="unknown">mac_core</td>
+<td class="done">sgi</td>
+</tr>
+
+<tr><td>patest_callbackstop.c</td><td> Test the paComplete callback result code </td>
+<td class="unknown">wmme</td>
+<td class="unknown">ds</td>
+<td class="unknown">asio</td>
+<td class="unknown">alsa</td>
+<td class="unknown">jack</td>
+<td class="unknown">oss</td>
+<td class="unknown">mac_sm</td>
+<td class="unknown">mac_core</td>
+<td class="done">sgi</td>
+</tr>
+
+<tr><td>patest_clip.c</td><td> Play a sine wave for several seconds at an amplitude that would require clipping </td>
+<td class="unknown">wmme</td>
+<td class="unknown">ds</td>
+<td class="unknown">asio</td>
+<td class="unknown">alsa</td>
+<td class="unknown">jack</td>
+<td class="unknown">oss</td>
+<td class="unknown">mac_sm</td>
+<td class="unknown">mac_core</td>
+<td class="done">sgi</td>
+</tr>
+
+<tr><td>patest_dither.c</td><td> Attempt to hear difference between dithered and non-dithered signal</td>
+<td class="unknown">wmme</td>
+<td class="unknown">ds</td>
+<td class="unknown">asio</td>
+<td class="unknown">alsa</td>
+<td class="unknown">jack</td>
+<td class="unknown">oss</td>
+<td class="unknown">mac_sm</td>
+<td class="unknown">mac_core</td>
+<td class="done">sgi</td>
+</tr>
+
+<tr><td>patest_hang.c</td><td> Play a sine then hang audio callback to test watchdog </td>
+<td class="unknown">wmme</td>
+<td class="unknown">ds</td>
+<td class="unknown">asio</td>
+<td class="unknown">alsa</td>
+<td class="unknown">jack</td>
+<td class="unknown">oss</td>
+<td class="unknown">mac_sm</td>
+<td class="unknown">mac_core</td>
+<td class="done">sgi</td>
+</tr>
+
+<tr><td>patest_latency.c</td><td> Hear the latency caused by big buffers. Play a sine wave and change frequency based on letter input </td>
+<td class="unknown">wmme</td>
+<td class="unknown">ds</td>
+<td class="unknown">asio</td>
+<td class="unknown">alsa</td>
+<td class="unknown">jack</td>
+<td class="unknown">oss</td>
+<td class="unknown">mac_sm</td>
+<td class="unknown">mac_core</td>
+<td class="done">sgi</td>
+</tr>
+
+<tr><td>patest_leftright.c</td><td> Play different tone sine waves that alternate between left and right channel </td>
+<td class="unknown">wmme</td>
+<td class="unknown">ds</td>
+<td class="unknown">asio</td>
+<td class="unknown">alsa</td>
+<td class="unknown">jack</td>
+<td class="unknown">oss</td>
+<td class="unknown">mac_sm</td>
+<td class="unknown">mac_core</td>
+<td class="done">sgi</td>
+</tr>
+
+<tr><td>patest_longsine.c</td><td> Play a sine wave until ENTER hit </td>
+<td class="unknown">wmme</td>
+<td class="unknown">ds</td>
+<td class="unknown">asio</td>
+<td class="unknown">alsa</td>
+<td class="unknown">jack</td>
+<td class="unknown">oss</td>
+<td class="unknown">mac_sm</td>
+<td class="unknown">mac_core</td>
+<td class="done">sgi</td>
+</tr>
+
+<tr><td>patest_many.c</td><td> Start and stop the PortAudio Driver multiple times </td>
+<td class="unknown">wmme</td>
+<td class="unknown">ds</td>
+<td class="unknown">asio</td>
+<td class="unknown">alsa</td>
+<td class="unknown">jack</td>
+<td class="unknown">oss</td>
+<td class="unknown">mac_sm</td>
+<td class="unknown">mac_core</td>
+<td class="done">sgi</td>
+</tr>
+
+<tr><td>patest_maxsines.c</td><td> How many sine waves can we calculate and play in less than 80% CPU Load </td>
+<td class="unknown">wmme</td>
+<td class="unknown">ds</td>
+<td class="unknown">asio</td>
+<td class="unknown">alsa</td>
+<td class="unknown">jack</td>
+<td class="unknown">oss</td>
+<td class="unknown">mac_sm</td>
+<td class="unknown">mac_core</td>
+<td class="done">sgi</td>
+</tr>
+
+<tr><td>patest_multi_sine.c</td><td> Play a different sine wave on each channel </td>
+<td class="unknown">wmme</td>
+<td class="unknown">ds</td>
+<td class="unknown">asio</td>
+<td class="unknown">alsa</td>
+<td class="unknown">jack</td>
+<td class="unknown">oss</td>
+<td class="unknown">mac_sm</td>
+<td class="unknown">mac_core</td>
+<td class="done">sgi</td>
+</tr>
+
+<tr><td>patest_pink.c</td><td> Generate Pink Noise using Gardner method </td>
+<td class="unknown">wmme</td>
+<td class="unknown">ds</td>
+<td class="unknown">asio</td>
+<td class="unknown">alsa</td>
+<td class="unknown">jack</td>
+<td class="unknown">oss</td>
+<td class="unknown">mac_sm</td>
+<td class="unknown">mac_core</td>
+<td class="done">sgi</td>
+</tr>
+
+<tr><td>patest_prime.c</td><td> Test stream priming mode </td>
+<td class="unknown">wmme</td>
+<td class="unknown">ds</td>
+<td class="unknown">asio</td>
+<td class="unknown">alsa</td>
+<td class="unknown">jack</td>
+<td class="unknown">oss</td>
+<td class="unknown">mac_sm</td>
+<td class="unknown">mac_core</td>
+<td class="done">sgi</td>
+</tr>
+
+<tr><td>
+patest_read_record.c</td><td> Record input into an array; Save array to a file; Playback recorded data. Implemented using the blocking API (Pa_ReadStream(), Pa_WriteStream() ) </td>
+<td class="unknown">wmme</td>
+<td class="unknown">ds</td>
+<td class="unknown">asio</td>
+<td class="unknown">alsa</td>
+<td class="unknown">jack</td>
+<td class="unknown">oss</td>
+<td class="unknown">mac_sm</td>
+<td class="unknown">mac_core</td>
+<td class="done">sgi</td>
+</tr>
+
+<tr><td>patest_record.c</td><td> Record input into an array; Save array to a file; Playback recorded data </td>
+<td class="unknown">wmme</td>
+<td class="unknown">ds</td>
+<td class="unknown">asio</td>
+<td class="unknown">alsa</td>
+<td class="unknown">jack</td>
+<td class="unknown">oss</td>
+<td class="unknown">mac_sm</td>
+<td class="unknown">mac_core</td>
+<td class="done">sgi</td>
+</tr>
+
+<tr><td>patest_ringmix.c</td><td> Ring modulate inputs to left output, mix inputs to right output </td>
+<td class="unknown">wmme</td>
+<td class="unknown">ds</td>
+<td class="unknown">asio</td>
+<td class="unknown">alsa</td>
+<td class="unknown">jack</td>
+<td class="unknown">oss</td>
+<td class="unknown">mac_sm</td>
+<td class="unknown">mac_core</td>
+<td class="done">sgi</td>
+</tr>
+
+<tr><td>patest_saw.c</td><td> Play a simple (aliasing) sawtooth wave </td>
+<td class="unknown">wmme</td>
+<td class="unknown">ds</td>
+<td class="unknown">asio</td>
+<td class="unknown">alsa</td>
+<td class="unknown">jack</td>
+<td class="unknown">oss</td>
+<td class="unknown">mac_sm</td>
+<td class="unknown">mac_core</td>
+<td class="done">sgi</td>
+</tr>
+
+<tr><td>patest_sine.c</td><td> Play a sine wave for several seconds </td>
+<td class="unknown">wmme</td>
+<td class="unknown">ds</td>
+<td class="unknown">asio</td>
+<td class="unknown">alsa</td>
+<td class="unknown">jack</td>
+<td class="unknown">oss</td>
+<td class="unknown">mac_sm</td>
+<td class="unknown">mac_core</td>
+<td class="done">sgi</td>
+</tr>
+
+<tr><td>patest_sine8.c</td><td> Test 8 bit data: play a sine wave for several seconds</td>
+<td class="unknown">wmme</td>
+<td class="unknown">ds</td>
+<td class="unknown">asio</td>
+<td class="unknown">alsa</td>
+<td class="unknown">jack</td>
+<td class="unknown">oss</td>
+<td class="unknown">mac_sm</td>
+<td class="unknown">mac_core</td>
+<td class="done">sgi</td>
+</tr>
+
+<tr><td>patest_sine_formats.c</td><td> Play a sine wave for several seconds. Test various data formats </td>
+<td class="unknown">wmme</td>
+<td class="unknown">ds</td>
+<td class="unknown">asio</td>
+<td class="unknown">alsa</td>
+<td class="unknown">jack</td>
+<td class="unknown">oss</td>
+<td class="unknown">mac_sm</td>
+<td class="unknown">mac_core</td>
+<td class="done">sgi</td>
+</tr>
+
+<tr><td>patest_sine_time.c</td><td> Play a sine wave for several seconds, pausing in the middle. Uses the Pa_GetStreamTime() call </td>
+<td class="unknown">wmme</td>
+<td class="unknown">ds</td>
+<td class="unknown">asio</td>
+<td class="unknown">alsa</td>
+<td class="unknown">jack</td>
+<td class="unknown">oss</td>
+<td class="unknown">mac_sm</td>
+<td class="unknown">mac_core</td>
+<td class="done">sgi</td>
+</tr>
+
+<tr><td>patest_start_stop.c</td><td> Play a sine wave for several seconds start and stop the stream multiple times</td>
+<td class="unknown">wmme</td>
+<td class="unknown">ds</td>
+<td class="unknown">asio</td>
+<td class="unknown">alsa</td>
+<td class="unknown">jack</td>
+<td class="unknown">oss</td>
+<td class="unknown">mac_sm</td>
+<td class="unknown">mac_core</td>
+<td class="done">sgi</td>
+</tr>
+
+<tr><td>patest_stop.c</td><td> Test different ways of stopping audio </td>
+<td class="unknown">wmme</td>
+<td class="unknown">ds</td>
+<td class="unknown">asio</td>
+<td class="unknown">alsa</td>
+<td class="unknown">jack</td>
+<td class="unknown">oss</td>
+<td class="unknown">mac_sm</td>
+<td class="unknown">mac_core</td>
+<td class="done">sgi</td>
+</tr>
+
+<tr><td>patest_sync.c</td><td> Test time stamping and synchronization of audio and video </td>
+<td class="unknown">wmme</td>
+<td class="unknown">ds</td>
+<td class="unknown">asio</td>
+<td class="unknown">alsa</td>
+<td class="unknown">jack</td>
+<td class="unknown">oss</td>
+<td class="unknown">mac_sm</td>
+<td class="unknown">mac_core</td>
+<td class="done">sgi</td>
+</tr>
+
+<tr><td>patest_toomanysines.c</td><td> Play more sine waves than we can handle in real time as a stress test </td>
+<td class="unknown">wmme</td>
+<td class="unknown">ds</td>
+<td class="unknown">asio</td>
+<td class="unknown">alsa</td>
+<td class="unknown">jack</td>
+<td class="unknown">oss</td>
+<td class="unknown">mac_sm</td>
+<td class="unknown">mac_core</td>
+<td class="done">sgi</td>
+</tr>
+
+<tr><td>patest_underflow.c</td><td> Simulate an output buffer underflow condition. Tests whether the stream can be stopped when underflowing buffers</td>
+<td class="unknown">wmme</td>
+<td class="unknown">ds</td>
+<td class="unknown">asio</td>
+<td class="unknown">alsa</td>
+<td class="unknown">jack</td>
+<td class="unknown">oss</td>
+<td class="unknown">mac_sm</td>
+<td class="unknown">mac_core</td>
+<td class="done">sgi</td>
+</tr>
+
+<tr><td>patest_wire.c</td><td> Pass input directly to output </td>
+<td class="unknown">wmme</td>
+<td class="unknown">ds</td>
+<td class="unknown">asio</td>
+<td class="unknown">alsa</td>
+<td class="unknown">jack</td>
+<td class="unknown">oss</td>
+<td class="unknown">mac_sm</td>
+<td class="unknown">mac_core</td>
+<td class="done">sgi</td>
+</tr>
+
+<tr><td>patest_write_sine.c</td><td> Play a sine wave for several seconds using the blocking API (Pa_WriteStream()) </td>
+<td class="unknown">wmme</td>
+<td class="unknown">ds</td>
+<td class="unknown">asio</td>
+<td class="unknown">alsa</td>
+<td class="unknown">jack</td>
+<td class="unknown">oss</td>
+<td class="unknown">mac_sm</td>
+<td class="unknown">mac_core</td>
+<td class="done">sgi</td>
+</tr>
+
+</table>
 
 
 <H2>Where to From Here?</H2>
 
 <p>
-The above status report needs to be taken in the context of the V18 release, the features it implemented (and didn't implement), and the quality and consistency of its implementations. For example many features listed above were not part of the V18 API, some were not consistently implemented accross all platforms, and some of the bug-like items were also present in V18. It remains to be decided whether every item above must be marked complete before V19 is released. One option we are considering is to release V19 as soon as it can do everything V18 could do.
+It remains to be decided whether every item above must be marked complete before V19 is released. However there will need to be more than one platform totally complete before we can consider releasing anything. For the time being, the focus is on completing the uncompleted tasks listed on this page.
 </p>
 
 <H2>How Can I Help?</H2>
@@ -593,4 +1007,4 @@ There are many ways in which you can help with V19 development. To begin with, s
 
 
 </BODY>
-</HTML>   ×
+</HTML>  l 
