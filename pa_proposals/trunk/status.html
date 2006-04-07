@@ -38,15 +38,17 @@ TD.na	{}
 For some years PortAudio development proceeded incrementally - bugs were fixed, new implementations were created and a few features were added. Around the time of the original V18 release in 2001 a big list of requested features existed, and there were many separate implementations of the PortAudio API, some with more cut-and-paste commonality than code sharing. Due to a combination of forces, most notably the desire to support multiple Host APIs in a single PortAudio build, it was decided to develop a new unified common infrastructure (support library) with which to implement V19. At that time the feature requests were developed into a set of <a href="index.html">enhancement proposals</a> which describe the new (Version 2.0) PortAudio API now documented in V19's <a href="http://www.portaudio.com/docs/v19-doxydocs/portaudio_8h.html">portaudio.h</a>. The proposals have been stable since 2003. The common infrastructure is implemented in the <a href="http://www.portaudio.com/usingcvs.html">v19-devel CVS branch</a>, and the version 2.0 API is well documented, and available as part of the <a href="http://www.portaudio.com/docs/v19-doxydocs/">doxygen generated documentation</a>.
 </P>
 
-<P>Although each proposal is relatively small when taken in isolation, the overall scale of required changes from V18 to V19 is substantial. The new common infrastructure imposes a new interface for implementations. This new interface increases reliability and consistency and reduces development effort, but calls for considerable refactoring (some would say redevelopment) of existing PortAudio implementations relative to the V18 code base. 
-</P>
+<P>Although each proposal is relatively small when taken in isolation, the overall scale of required changes from V18 to V19 is substantial. The new common infrastructure imposes a new interface for implementations. This new interface increases reliability and consistency and reduces development effort, but calls for considerable refactoring (some would say redevelopment) of existing PortAudio implementations relative to the V18 code base. 
+</P>
+
 <P>
 At the time of writing, a substantial portion of V19 functionality has been implemented for Windows (MME, DirectSound, and ASIO) for Linux (ALSA, OSS, and JACK), and for Mac OSX Core Audio. Platforms which were well supported with V18 which are not currently supported by V19 are SGI AL and pre-OSX Macintosh (Sound Manager). The V19 ASIO implementation has not been back-ported to the Macintosh, however it would require little effort to do so if the need arose.
 </P>
-<P>
+
+<P>
 The amount of development required to move from V18 release to V19 release has proven to be a significant obstacle to completing the V19 release. In hindsight it may have been preferable to plan an incremental change schedule for migrating implementations from V18 to the new version 2.0 API. However hindsight is of little benefit to us now, and we need a plan to finalise the V19 release, the remainder of this document is part of that plan.
 </P>
-
+
 
 <H2>Implementation Status</H2>
 
@@ -1085,4 +1087,4 @@ There are many ways in which you can help with V19 development. To begin with, s
 
 
 </BODY>
-</HTML>  K 
+</HTML>
