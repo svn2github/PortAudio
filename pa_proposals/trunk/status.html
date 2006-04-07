@@ -30,18 +30,18 @@ TD.na	{}
 </CENTER>
 
 <P><A href="http://www.portaudio.com/">PortAudio Home Page</A></P>
-<P>Updated: May 11, 2004 </P>
+<P>Updated: April 6, 2006 </P>
 
 <H2>Background</H2>
 
 <P>
-For some years PortAudio development proceeded incrementally - bugs were fixed, new implementations were created and a few features were added. Around the time of the original V18 release in 2001 a big list of requested features existed, and there were many separate implementations of the PortAudio API, some with more cut-and-paste commonality than code sharing. Due to a combination of forces, most notably the desire to support multiple Host APIs in a single PortAudio build, it was decided to develop a new unified common infrastructure (support library) with which to implement V19. At that time the feature requests were developed into a set of <a href="index.html">enhancement proposals</a> which describe the new (Version 2.0) PortAudio API now documented in V19's <a href="http://www.portaudio.com/docs/v19-doxydocs/portaudio_8h.html">portaudio.h</a>. The proposals have been stable for some time (close to a year). The common infrastructure is now largely implemented in the <a href="http://www.portaudio.com/usingcvs.html">v19-devel CVS branch</a>, and the version 2.0 API is well documented, and available as part of the <a href="http://www.portaudio.com/docs/v19-doxydocs/">doxygen generated documentation</a>.
+For some years PortAudio development proceeded incrementally - bugs were fixed, new implementations were created and a few features were added. Around the time of the original V18 release in 2001 a big list of requested features existed, and there were many separate implementations of the PortAudio API, some with more cut-and-paste commonality than code sharing. Due to a combination of forces, most notably the desire to support multiple Host APIs in a single PortAudio build, it was decided to develop a new unified common infrastructure (support library) with which to implement V19. At that time the feature requests were developed into a set of <a href="index.html">enhancement proposals</a> which describe the new (Version 2.0) PortAudio API now documented in V19's <a href="http://www.portaudio.com/docs/v19-doxydocs/portaudio_8h.html">portaudio.h</a>. The proposals have been stable since 2003. The common infrastructure is implemented in the <a href="http://www.portaudio.com/usingcvs.html">v19-devel CVS branch</a>, and the version 2.0 API is well documented, and available as part of the <a href="http://www.portaudio.com/docs/v19-doxydocs/">doxygen generated documentation</a>.
 </P>
 
 <P>Although each proposal is relatively small when taken in isolation, the overall scale of required changes from V18 to V19 is substantial. The new common infrastructure imposes a new interface for implementations. This new interface increases reliability and consistency and reduces development effort, but calls for considerable refactoring (some would say redevelopment) of existing PortAudio implementations relative to the V18 code base. 
 </P>
 <P>
-At the time of writing, a substantial portion of V19 functionality has been implemented for Windows (MME, DirectSound, and ASIO) for Linux (ALSA, OSS, and JACK), and SGI. However no work has commenced on the Macintosh (SoundManager, CoreAudio) which was well supported by V18. The current ASIO version has not been back-ported to the Macintosh, however it would require little effort to do so.
+At the time of writing, a substantial portion of V19 functionality has been implemented for Windows (MME, DirectSound, and ASIO) for Linux (ALSA, OSS, and JACK), and for Mac OSX Core Audio. Platforms which were well supported with V18 which are not currently supported by V19 are SGI AL and pre-OSX Macintosh (Sound Manager). The V19 ASIO implementation has not been back-ported to the Macintosh, however it would require little effort to do so if the need arose.
 </P>
 <P>
 The amount of development required to move from V18 release to V19 release has proven to be a significant obstacle to completing the V19 release. In hindsight it may have been preferable to plan an incremental change schedule for migrating implementations from V18 to the new version 2.0 API. However hindsight is of little benefit to us now, and we need a plan to finalise the V19 release, the remainder of this document is part of that plan.
@@ -74,13 +74,13 @@ The list below indicates issues related to the common infrastructure code which 
 <li>Internal interface documentation (need to finish pa_process.h documentation) 
 <span class="done">done</span>
 
-<li>Some conversion functions (primarily those to and from 8 bit formats) are not yet implemented in pa_converters.c (some are also marked REVIEW)
+<li>Ten relatively obscure conversion functions are not yet implemented in pa_converters.c these are marked IMPLEMENT ME. 8 conversion functions are also marked REVIEW
 <span class="not_done">todo</span>
 
-<li>timeInfo->currentTime not implemented in PaUtil_BeginBufferProcessing()
+<li>correct handling of timeInfo->currentTime not implemented in PaUtil_BeginBufferProcessing()
 <span class="not_done">todo</span>
 
-<li>Tests (some tests from V18 have not been converted to use the V19 API, see README.txt in the pa_tests directory)
+<li>Tests (a few tests from V18 have not been converted to use the V19 API, see README.txt in the pa_tests directory)
 <span class="not_done">todo</span>
 
 <li>Priming stream with callback not supported by the complex adaption buffer adapter
@@ -101,7 +101,7 @@ The list below indicates issues related to the common infrastructure code which 
 <li>Improve error checking (some new error codes needed) and other cleanups described in the <a href="http://www.portaudio.com/docs/v19-doxydocs/todo.html">todo list</a>
 <span class="not_done">todo</span>
 
-<li>Directory structure (there is some talk of updating the project directory structure)
+<li>Restructure directory structure (see proposal)
 <span class="not_done">todo</span>
 
 <li>Infrastructure for blocking i/o (may still need to extend pa_process for some unixes)
@@ -110,7 +110,7 @@ The list below indicates issues related to the common infrastructure code which 
 <li>pa_cpuload uses an IIR filter to smooth CPU load measurements, but the coefficients are not varied depending on the update rate.
 <span class="not_done">todo</span>
 
-<li>Non-Interleaved buffer support - implemented in pa_process.c(see <a href="006-NonInterleavedBuffers.html">proposal 006</a>)
+<li>Non-Interleaved buffer support - implemented in pa_process.c (see <a href="006-NonInterleavedBuffers.html">proposal 006</a>)
 <span class="done">done</span>
 
 <li>Multiple Host APIs in a Single PortAudio Build - implemented in pa_front.c (see <a href="007-MultipleHostAPIsInASingleBuild.html">proposal 007</a>)
@@ -203,7 +203,7 @@ All features marked <span class="done">green</span> are thought to be implemente
 <td class="done">jack</td>
 <td class="done">oss</td>
 <td class="not_done">mac_sm</td>
-<td class="not_done">mac_core</td>
+<td class="done">mac_core</td>
 <td class="done">sgi</td>
 </tr>
 
@@ -215,7 +215,7 @@ All features marked <span class="done">green</span> are thought to be implemente
 <td class="done">jack</td>
 <td class="not_done">oss</td>
 <td class="not_done">mac_sm</td>
-<td class="not_done">mac_core</td>
+<td class="done">mac_core</td>
 <td class="done">sgi</td>
 </tr>
 
@@ -227,7 +227,7 @@ All features marked <span class="done">green</span> are thought to be implemente
 <td class="done">jack</td>
 <td class="done">oss</td>
 <td class="not_done">mac_sm</td>
-<td class="not_done">mac_core</td>
+<td class="done">mac_core</td>
 <td class="unknown">sgi</td>
 </tr>
 
@@ -239,7 +239,7 @@ All features marked <span class="done">green</span> are thought to be implemente
 <td class="done">jack</td>
 <td class="done">oss</td>
 <td class="not_done">mac_sm</td>
-<td class="not_done">mac_core</td>
+<td class="done">mac_core</td>
 <td class="done">sgi</td>
 </tr>
 
@@ -263,7 +263,7 @@ All features marked <span class="done">green</span> are thought to be implemente
 <td class="done">jack</td>
 <td class="unknown">oss</td>
 <td class="not_done">mac_sm</td>
-<td class="not_done">mac_core</td>
+<td class="unknown">mac_core</td>
 <td class="done">sgi</td>
 </tr>
 
@@ -275,7 +275,7 @@ All features marked <span class="done">green</span> are thought to be implemente
 <td class="not_done">jack</td>
 <td class="unknown">oss</td>
 <td class="not_done">mac_sm</td>
-<td class="not_done">mac_core</td>
+<td class="done">mac_core</td>
 <td class="done">sgi</td>
 </tr>
 
@@ -287,7 +287,7 @@ All features marked <span class="done">green</span> are thought to be implemente
 <td class="not_done">jack</td>
 <td class="unknown">oss</td>
 <td class="not_done">mac_sm</td>
-<td class="not_done">mac_core</td>
+<td class="done">mac_core</td>
 <td class="doneone">sgi</td>
 </tr>
 
@@ -299,7 +299,7 @@ All features marked <span class="done">green</span> are thought to be implemente
 <td class="not_done">jack</td>
 <td class="not_done">oss</td>
 <td class="not_done">mac_sm</td>
-<td class="not_done">mac_core</td>
+<td class="done">mac_core</td>
 <td class="done">sgi</td>
 </tr>
 
@@ -311,7 +311,7 @@ All features marked <span class="done">green</span> are thought to be implemente
 <td class="done">jack</td>
 <td class="not_done">oss</td>
 <td class="not_done">mac_sm</td>
-<td class="not_done">mac_core</td>
+<td class="done">mac_core</td>
 <td class="done">sgi</td>
 </tr>
 
@@ -371,7 +371,7 @@ All features marked <span class="done">green</span> are thought to be implemente
 <td class="done">jack</td>
 <td class="done">oss</td>
 <td class="not_done">mac_sm</td>
-<td class="not_done">mac_core</td>
+<td class="done">mac_core</td>
 <td class="done">sgi</td>
 </tr>
 
@@ -383,7 +383,7 @@ All features marked <span class="done">green</span> are thought to be implemente
 <td class="done">jack</td>
 <td class="done">oss</td>
 <td class="not_done">mac_sm</td>
-<td class="not_done">mac_core</td>
+<td class="done">mac_core</td>
 <td class="done">sgi</td>
 </tr>
 
@@ -408,7 +408,7 @@ platform specific extension, not required</td>
 <td class="unknown">jack</td>
 <td class="unknown">oss</td>
 <td class="not_done">mac_sm</td>
-<td class="not_done">mac_core</td>
+<td class="unknown">mac_core</td>
 <td class="done">sgi</td>
 </tr>
 
@@ -432,7 +432,7 @@ platform specific extension, not required</td>
 <td class="unknown">jack</td>
 <td class="unknown">oss</td>
 <td class="not_done">mac_sm</td>
-<td class="not_done">mac_core</td>
+<td class="done">mac_core</td>
 <td class="done">sgi</td>
 </tr>
 
@@ -444,7 +444,7 @@ platform specific extension, not required</td>
 <td class="unknown">jack</td>
 <td class="unknown">oss</td>
 <td class="not_done">mac_sm</td>
-<td class="not_done">mac_core</td>
+<td class="done">mac_core</td>
 <td class="done">sgi</td>
 </tr>
 
@@ -456,7 +456,7 @@ platform specific extension, not required</td>
 <td class="unknown">jack</td>
 <td class="unknown">oss</td>
 <td class="not_done">mac_sm</td>
-<td class="not_done">mac_core</td>
+<td class="done">mac_core</td>
 <td class="done">sgi</td>
 </tr>
 
@@ -468,7 +468,7 @@ platform specific extension, not required</td>
 <td class="unknown">jack</td>
 <td class="unknown">oss</td>
 <td class="not_done">mac_sm</td>
-<td class="not_done">mac_core</td>
+<td class="done">mac_core</td>
 <td class="done">sgi</td>
 </tr>
 
@@ -480,7 +480,7 @@ platform specific extension, not required</td>
 <td class="unknown">jack</td>
 <td class="unknown">oss</td>
 <td class="not_done">mac_sm</td>
-<td class="not_done">mac_core</td>
+<td class="done">mac_core</td>
 <td class="done">sgi</td>
 </tr>
 
@@ -492,7 +492,7 @@ platform specific extension, not required</td>
 <td class="unknown">jack</td>
 <td class="unknown">oss</td>
 <td class="not_done">mac_sm</td>
-<td class="not_done">mac_core</td>
+<td class="done">mac_core</td>
 <td class="done">sgi</td>
 </tr>
 
@@ -504,7 +504,7 @@ platform specific extension, not required</td>
 <td class="unknown">jack</td>
 <td class="unknown">oss</td>
 <td class="not_done">mac_sm</td>
-<td class="not_done">mac_core</td>
+<td class="done">mac_core</td>
 <td class="done">sgi</td>
 </tr>
 
@@ -516,7 +516,7 @@ platform specific extension, not required</td>
 <td class="unknown">jack</td>
 <td class="unknown">oss</td>
 <td class="not_done">mac_sm</td>
-<td class="not_done">mac_core</td>
+<td class="unknown">mac_core</td>
 <td class="done">sgi</td>
 </tr>
 
@@ -528,7 +528,7 @@ platform specific extension, not required</td>
 <td class="unknown">jack</td>
 <td class="unknown">oss</td>
 <td class="not_done">mac_sm</td>
-<td class="not_done">mac_core</td>
+<td class="unknown">mac_core</td>
 <td class="done">sgi</td>
 </tr>
 
@@ -541,7 +541,7 @@ platform specific extension, not required</td>
 <td class="not_done">jack</td>
 <td class="unknown">oss</td>
 <td class="not_done">mac_sm</td>
-<td class="not_done">mac_core</td>
+<td class="unknown">mac_core</td>
 <td class="done">sgi</td>
 </tr>
 
@@ -601,7 +601,7 @@ If there is a specific feature which has been implemented, but is not listed abo
 </p>
 
 <p>
-The above status report needs to be taken in the context of the V18 release, the features it implemented (and didn't implement), and the quality and consistency of its implementations. For example many features listed above were not part of the V18 API, some were not consistently implemented accross all platforms, and some of the bug-like items were also present in V18. So the overall conclusion is that V19 is in pretty good shape. Aside from the total lack of support on the Mac at this stage, the V19 API is moderately functional on all other platforms, in many cases to a level that matches or surpasses V18.
+The above status report needs to be taken in the context of the V18 release, the features it implemented (and didn't implement), and the quality and consistency of its implementations. For example many features listed above were not part of the V18 API, some were not consistently implemented accross all platforms, and some of the bug-like items were also present in V18. So the overall conclusion is that V19 is in pretty good shape. The V19 API is functional on all platforms, in many cases to a level that matches or surpasses V18.
 </p>
 
 <H3>Tests</H3>
@@ -1085,4 +1085,4 @@ There are many ways in which you can help with V19 development. To begin with, s
 
 
 </BODY>
-</HTML>    
+</HTML>  K 
