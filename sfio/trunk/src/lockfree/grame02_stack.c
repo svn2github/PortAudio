@@ -50,13 +50,13 @@ static int CAS2( volatile grame02_stack_t *p, volatile void *oldPtr, volatile un
 }
 
 
-LIBLF_CALLING_CONVENTION(void) grame02_stack_initialize( grame02_stack_t* stack )
+LIBLFDS_CALLING_CONVENTION(void) grame02_stack_initialize( grame02_stack_t* stack )
 {
     stack->top = 0;
 }
 
 
-LIBLF_CALLING_CONVENTION(void) grame02_stack_push( grame02_stack_t* stack, grame02_stack_node_t *node )
+LIBLFDS_CALLING_CONVENTION(void) grame02_stack_push( grame02_stack_t* stack, grame02_stack_node_t *node )
 {
 // B1: loop
     for(;;){
@@ -76,7 +76,7 @@ LIBLF_CALLING_CONVENTION(void) grame02_stack_push( grame02_stack_t* stack, grame
 }
 
 
-LIBLF_CALLING_CONVENTION(grame02_stack_node_t*) grame02_stack_pop( grame02_stack_t* stack )
+LIBLFDS_CALLING_CONVENTION(grame02_stack_node_t*) grame02_stack_pop( grame02_stack_t* stack )
 {
     grame02_stack_node_t *top, *next;
     unsigned long pop_count;
@@ -109,7 +109,7 @@ LIBLF_CALLING_CONVENTION(grame02_stack_node_t*) grame02_stack_pop( grame02_stack
 }
 
 
-LIBLF_CALLING_CONVENTION(void) grame02_stack_test(void)
+LIBLFDS_CALLING_CONVENTION(void) grame02_stack_test(void)
 {
     const char *s = "\n!dlrow olleh";
     grame02_stack_t stack;

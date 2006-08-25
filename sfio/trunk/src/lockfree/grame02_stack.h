@@ -4,15 +4,16 @@
 /*
     multiple-reader, multiple-writer lock-free LIFO stack
 
-D. Fober, S. Letz, Y. Orlarey 
-Actes des Journées d'Informatique Musicale JIM2002, Marseille GMEM 2002 Pages 143--150.
-ftp://ftp.grame.fr/pub/Documents/fober-JIM2002.pdf
+    D. Fober, S. Letz, Y. Orlarey
+    "Lock-Free Techniques for Concurrent Access to Shared Objects,"
+    Actes des Journées d'Informatique Musicale JIM2002, Marseille GMEM 2002 Pages 143--150.
+    ftp://ftp.grame.fr/pub/Documents/fober-JIM2002.pdf
 
-actually i think this is the IBM algorithm, but I havn't found the reference yet
+    actually i think this is the IBM freelist algorithm, but I havn't found the reference yet
 */
 
 
-#define LIBLF_CALLING_CONVENTION( return_type )  return_type __stdcall
+#define LIBLFDS_CALLING_CONVENTION( return_type )  return_type __stdcall
 
 #ifdef __cplusplus
 extern "C"
@@ -20,7 +21,7 @@ extern "C"
 #endif /* __cplusplus */
 
 
-typedef void* grame02_value_t;     // this is the "payload" data type which is stored in the stack node
+typedef void* grame02_value_t;     /* this is the "payload" data type which is stored in the stack node */
 
 struct grame02_stack_node_t;
 typedef struct grame02_stack_node_t grame02_stack_node_t;
@@ -43,13 +44,13 @@ typedef struct grame02_stack_t{
 #pragma pack( pop )
 
 
-LIBLF_CALLING_CONVENTION(void) grame02_stack_initialize( grame02_stack_t* stack );
+LIBLFDS_CALLING_CONVENTION(void) grame02_stack_initialize( grame02_stack_t* stack );
 
-LIBLF_CALLING_CONVENTION(void) grame02_stack_push( grame02_stack_t* stack, grame02_stack_node_t *node );
+LIBLFDS_CALLING_CONVENTION(void) grame02_stack_push( grame02_stack_t* stack, grame02_stack_node_t *node );
 
-LIBLF_CALLING_CONVENTION(grame02_stack_node_t*) grame02_stack_pop( grame02_stack_t* stack );
+LIBLFDS_CALLING_CONVENTION(grame02_stack_node_t*) grame02_stack_pop( grame02_stack_t* stack );
 
-LIBLF_CALLING_CONVENTION(void) grame02_stack_test(void);
+LIBLFDS_CALLING_CONVENTION(void) grame02_stack_test(void);
 
 #ifdef __cplusplus
 }

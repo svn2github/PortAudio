@@ -117,7 +117,7 @@ static void read_barrier(void)
 
 
 
-LIBLF_CALLING_CONVENTION(void) ms96_queue_initialize( ms96_queue_t *q, ms96_queue_node_t* node )
+LIBLFDS_CALLING_CONVENTION(void) ms96_queue_initialize( ms96_queue_t *q, ms96_queue_node_t* node )
 {
 // node = new node()           # Allocate a free node
     // this is a modified version of the algorithm which accepts the node as a parameter
@@ -139,7 +139,7 @@ static void assert_empty(  ms96_queue_t* queue )
 }
 
 
-LIBLF_CALLING_CONVENTION(void) ms96_queue_terminate( ms96_queue_t* queue, ms96_queue_node_t** node )
+LIBLFDS_CALLING_CONVENTION(void) ms96_queue_terminate( ms96_queue_t* queue, ms96_queue_node_t** node )
 {
     assert_empty( queue );
 
@@ -148,7 +148,7 @@ LIBLF_CALLING_CONVENTION(void) ms96_queue_terminate( ms96_queue_t* queue, ms96_q
 
 
 // enqueue(Q: pointer to queue t, value: data type)
-LIBLF_CALLING_CONVENTION(void) ms96_queue_enqueue( ms96_queue_t* q, ms96_queue_node_t *node, ms96_value_t value )
+LIBLFDS_CALLING_CONVENTION(void) ms96_queue_enqueue( ms96_queue_t* q, ms96_queue_node_t *node, ms96_value_t value )
 {
     ms96_tagged_node_pointer_t tail;
     ms96_tagged_node_pointer_t next;
@@ -209,7 +209,7 @@ LIBLF_CALLING_CONVENTION(void) ms96_queue_enqueue( ms96_queue_t* q, ms96_queue_n
 
 
 // dequeue(Q: pointer to queue t, pvalue: pointer to data type): boolean
-LIBLF_CALLING_CONVENTION(int) ms96_queue_dequeue( ms96_queue_t* q, ms96_queue_node_t** node, ms96_value_t* value )
+LIBLFDS_CALLING_CONVENTION(int) ms96_queue_dequeue( ms96_queue_t* q, ms96_queue_node_t** node, ms96_value_t* value )
 {
     ms96_tagged_node_pointer_t head;
     ms96_tagged_node_pointer_t tail;
@@ -278,7 +278,7 @@ LIBLF_CALLING_CONVENTION(int) ms96_queue_dequeue( ms96_queue_t* q, ms96_queue_no
 }
 
 
-LIBLF_CALLING_CONVENTION(void) ms96_queue_test(void)
+LIBLFDS_CALLING_CONVENTION(void) ms96_queue_test(void)
 {
     const char *s = "hello world!\n";
     ms96_queue_t q;
