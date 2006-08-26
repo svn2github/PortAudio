@@ -14,7 +14,7 @@ BCB = $(MAKEDIR)\..
 VERSION = BCB.04.04
 # ---------------------------------------------------------------------------
 PROJECT = BcbTestProject.exe
-OBJFILES = BcbTestProject.obj ms96_queue.obj grame02_stack.obj MessageQueue.obj
+OBJFILES = BcbTestProject.obj ms96_queue.obj MessageQueue.obj grame02_lifo.obj
 RESFILES =
 RESDEPEN = $(RESFILES)
 LIBFILES =

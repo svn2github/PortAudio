@@ -4,12 +4,12 @@
 #include <cstdio>
 
 #include "ms96_queue.h"
-#include "grame02_stack.h"
+#include "grame02_lifo.h"
 
 
 static size_t nodeSize_;
-static grame02_stack_t nodeFreeList_;
-static grame02_stack_t messageFreeList_;
+static grame02_lifo_t nodeFreeList_;
+static grame02_lifo_t messageFreeList_;
 
 // for now we limit the message size to 64 bytes, all messages occupy the same space.
 
@@ -22,19 +22,19 @@ static grame02_stack_t messageFreeList_;
 
 void Message::InitializeAllocator()
 {
-    nodeSize_ = std::max( sizeof(ms96_queue_node_t), sizeof(grame02_stack_node_t) );
+    nodeSize_ = std::max( sizeof(ms96_queue_node_t), sizeof(grame02_lifo_node_t) );
 
 
-    grame02_stack_initialize( &nodeFreeList_ );
-    grame02_stack_initialize( &messageFreeList_ );
+    grame02_lifo_initialize( &nodeFreeList_ );
+    grame02_lifo_initialize( &messageFreeList_ );
 }
 
 
 void* AllocateNode()
 {
-    grame02_stack_node_t *node = grame02_stack_pop( &nodeFreeList_ );
+    grame02_lifo_node_t *node = grame02_lifo_pop( &nodeFreeList_ );
     if( !node )
-        node = reinterpret_cast<grame02_stack_node_t*>( ::operator new( nodeSize_ ) );
+        node = reinterpret_cast<grame02_lifo_node_t*>( ::operator new( nodeSize_ ) );
 
     return node;
 }
@@ -42,7 +42,7 @@ void* AllocateNode()
 
 void FreeNode( void * node )
 {
-    grame02_stack_push( &nodeFreeList_, reinterpret_cast<grame02_stack_node_t*>(node) );
+    grame02_lifo_push( &nodeFreeList_, reinterpret_cast<grame02_lifo_node_t*>(node) );
 }
 
 
@@ -58,13 +58,13 @@ void* Message::operator new ( size_t size ) // throw( bad_alloc )
 {
     assert( size <= MAX_MESSAGE_SIZE ); // if you exceed this value you should retune the system...
     
-    grame02_stack_node_t *node = grame02_stack_pop( &messageFreeList_ );
+    grame02_lifo_node_t *node = grame02_lifo_pop( &messageFreeList_ );
     if( node ){
         Message *message = reinterpret_cast<Message*>( node->value ); // pretend we already have a message so we can set the lf node
         message->SetLFNode( node );
         return message;
     }else{
-        node = reinterpret_cast<grame02_stack_node_t*>( AllocateNode() );
+        node = reinterpret_cast<grame02_lifo_node_t*>( AllocateNode() );
         Message *message = reinterpret_cast<Message*>( ::operator new( MAX_MESSAGE_SIZE ) );
         message->SetLFNode( node );
         return message;
@@ -75,11 +75,11 @@ void* Message::operator new ( size_t size ) // throw( bad_alloc )
 void Message::operator delete ( void* p ) throw()
 {
     Message *message = reinterpret_cast<Message*>( p ); // pretend we already have a message so we can set the lf node
-    grame02_stack_node_t *node = reinterpret_cast<grame02_stack_node_t*>( message->GetLFNode() );
+    grame02_lifo_node_t *node = reinterpret_cast<grame02_lifo_node_t*>( message->GetLFNode() );
     assert( node );
 
     node->value = message;
-    grame02_stack_push( &messageFreeList_, node );
+    grame02_lifo_push( &messageFreeList_, node );
 }
 
 
