@@ -30,7 +30,15 @@ TD.na	{}
 </CENTER>
 
 <P><A href="http://www.portaudio.com/">PortAudio Home Page</A></P>
-<P>Updated: August 6, 2006 </P>
+<P>Updated: February 6, 2011 </P>
+
+
+<H2>UPDATE: this document is out of date</H2>
+
+<p>
+This document was used to track V19 development status during initial development. Development is now coordinated via TRAC tickets and the wiki. <a href="http://www.portaudio.com/trac/wiki/V19ReleasePlan">Visit the V19ReleasePlan page for current status information</a>.
+</p>
+
 
 <H2>Background</H2>
 
@@ -66,82 +74,6 @@ Items marked <span class="done">green</span> have been implemented, <span class=
 With some possible exceptions (such as (1) addition of new backward compatible structure fields, (2) additional error codes, and (3) documentation refinements), the API defined in <a href="http://www.portaudio.com/docs/v19-doxydocs/portaudio_8h.html">portaudio.h</a> is complete and will not change between now and the V19 release. For this reason, clients who wish to use V19 now and take advantage of the existing functionality may safely do so without hazard of major changes between now and the final V19 release.
 </p>
 
-<H3>Common Infrastructure</H3>
-
-<p>
-The list below indicates issues related to the common infrastructure code which is shared by all implementations. Items marked todo on these list still require work.
-</p>
-
-<ul>
-<li>Internal interface documentation (need to finish pa_process.h documentation) 
-<span class="done">done</span>
-
-<li>Ten relatively obscure conversion functions are not yet implemented in pa_converters.c these are marked IMPLEMENT ME. 8 conversion functions are also marked REVIEW
-<span class="not_done">todo</span>
-
-<li>correct handling of timeInfo->currentTime not implemented in PaUtil_BeginBufferProcessing()
-<span class="not_done">todo</span>
-
-<li>Tests (a few tests from V18 have not been converted to use the V19 API, see README.txt in the pa_tests directory)
-<span class="not_done">todo</span>
-
-<li>Priming stream with callback not supported by the complex adaption buffer adapter
-<span class="not_done">todo</span>
-
-<li>Underflow/overflow flags underspecified interaction with the callback adapter when buffer adaption is being used.
-<span class="done">done</span>
-
-<li>Support Underflow/overflow flags and paNeverDropInput in pa_process.c
-<span class="not_done">todo</span>
-
-<li>No way to query the buffer adaptor about the amount of latency it introduces
-<span class="done">done</span>
-
-<li>Should dithering always force clipping? (it did in V18)
-<span class="not_done">todo</span>
-
-<li>Improve error checking (some new error codes needed) and other cleanups described in the <a href="http://www.portaudio.com/docs/v19-doxydocs/todo.html">todo list</a>
-<span class="not_done">todo</span>
-
-<li>Restructure directory structure (see proposal)
-<span class="not_done">todo</span>
-
-<li>Infrastructure for blocking i/o (may still need to extend pa_process for some unixes)
-<span class="done">done</span>
-
-<li>pa_cpuload uses an IIR filter to smooth CPU load measurements, but the coefficients are not varied depending on the update rate.
-<span class="not_done">todo</span>
-
-<li>Non-Interleaved buffer support - implemented in pa_process.c (see <a href="006-NonInterleavedBuffers.html">proposal 006</a>)
-<span class="done">done</span>
-
-<li>Multiple Host APIs in a Single PortAudio Build - implemented in pa_front.c (see <a href="007-MultipleHostAPIsInASingleBuild.html">proposal 007</a>)
-<span class="done">done</span>
-
-<li>Reflect new stream state machine behavior - mostly implemented by common infrastructure, requires implementations to implement IsStopped() and IsActive() see below. (see <a href="010-ClarifyStreamStateMachine.html">proposal 010</a>)
-<span class="done">done</span>
-
-<li>rename various API functions and fields for consistency (see <a href="011-RenameExistingSymbolsForConsistency.html">proposal 011</a>)
-<span class="done">done</span>
-
-<li>clean up any open streams when Pa_Terminate() is called (see <a href="012 - Additional Pa_Terminate() Behavior">proposal 012</a>)
-<span class="done">done</span>
-
-<li>require calls to Pa_Initialize()/Pa_Terminate() to be correctly paired (see <a href="012 - Additional Pa_Terminate() Behavior">proposal 012</a>)
-<span class="done">done</span>
-
-<li>refactor implementation infrastructure including common code for sample format conversion (pa_converters.c), callback buffer size and interleave adaption  (pa_process.c), cpu load measurement (pa_cpuload.c) (see <a href="013-RefactorImplementationInfrastructure.html">proposal 013</a>)
-<span class="done">done</span>
-
-<li>Use Structs for Pa_OpenStream() Parameters (see <a href="016-UseStructsForOpenStreamParameters.html">proposal 016</a>) <span class="done">done</span>
-
-<li>Provide version information via Pa_GetVersion() and Pa_GetVersionText() (see <a href="018-VersionInformationInterface.html">proposal 018</a>) <span class="done">done</span>
-
-<li>Proposal 004, (among others), is not tested by any of the current pa_tests
-<span class="not_done">todo</span>
-
-
-</ul>
 
 <H3>Host API Feature Implementation</H3>
 
